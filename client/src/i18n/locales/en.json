@@ -77,6 +77,27 @@
     "recentWorkouts": "Recent workouts",
     "types": { "CARDIO": "Cardio", "STRENGTH": "Strength", "MIXED": "Mixed" }
   },
+  "analytics": {
+    "totalMembers": "Members",
+    "activeThisWeek": "Active / wk",
+    "peakHour": "Peak hour",
+    "currentOccupancy": "Occupancy",
+    "peakHours": "Peak hours",
+    "last30days": "Last 30 days",
+    "checkIns": "Check-ins",
+    "dailyTrend": "Daily check-ins",
+    "last14days": "Last 14 days",
+    "members": "Members",
+    "searchPlaceholder": "Search members...",
+    "member": "Member",
+    "visits": "Visits",
+    "thisWeek": "This week",
+    "lastVisit": "Last visit",
+    "status": "Status",
+    "never": "Never",
+    "noMembers": "No members found.",
+    "statuses": { "ACTIVE": "Active", "AT_RISK": "At risk", "INACTIVE": "Inactive" }
+  },
   "pages": {
     "dashboard": { "title": "Dashboard", "subtitle": "Your attendance and consistency at a glance." },
     "attendance": { "title": "Attendance", "subtitle": "Check in, track streaks, view your calendar." },
