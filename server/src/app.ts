@@ -3,6 +3,7 @@ import cors from 'cors';
 import { env } from './config/env.js';
 import { errorHandler } from './middleware/error.js';
 import authRoutes from './modules/auth/auth.routes.js';
+import attendanceRoutes from './modules/attendance/attendance.routes.js';
 
 export function createApp() {
   const app = express();
@@ -15,6 +16,7 @@ export function createApp() {
   });
 
   app.use('/api/auth', authRoutes);
+  app.use('/api/attendance', attendanceRoutes);
 
   // Error handler must be last.
   app.use(errorHandler);

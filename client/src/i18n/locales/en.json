@@ -26,6 +26,23 @@
   },
   "roles": { "MEMBER": "Member", "TRAINER": "Trainer", "ADMIN": "Admin" },
   "common": { "loading": "Loading...", "comingSoon": "Coming soon", "language": "Language" },
+  "attendance": {
+    "checkIn": "Check In",
+    "checkOut": "Check Out",
+    "full": "Gym Full",
+    "notCheckedIn": "You're not checked in yet today.",
+    "checkedInSince": "Checked in since {{time}}",
+    "checkedInToast": "Checked in. Have a great workout!",
+    "checkedOutToast": "Checked out. See you next time!",
+    "inGym": "in the gym",
+    "streak": "Streak",
+    "days": "days",
+    "thisWeek": "This week",
+    "thisMonth": "This month",
+    "allTime": "All time",
+    "dayStreak": "{{count}}-day streak",
+    "levels": { "LOW": "Low", "MEDIUM": "Medium", "HIGH": "High", "FULL": "Full" }
+  },
   "pages": {
     "dashboard": { "title": "Dashboard", "subtitle": "Your attendance and consistency at a glance." },
     "attendance": { "title": "Attendance", "subtitle": "Check in, track streaks, view your calendar." },

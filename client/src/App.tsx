@@ -7,13 +7,8 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { AppLayout } from './components/AppLayout';
 import { LoginPage } from './pages/LoginPage';
 import { SignupPage } from './pages/SignupPage';
-import {
-  AnalyticsPage,
-  AttendancePage,
-  DashboardPage,
-  ProfilePage,
-  SlotsPage,
-} from './pages';
+import { AttendancePage } from './pages/AttendancePage';
+import { AnalyticsPage, DashboardPage, ProfilePage, SlotsPage } from './pages';
 
 export default function App() {
   return (

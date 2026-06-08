@@ -104,7 +104,7 @@ document-model decision worth being able to explain.
 - [x] Early deploy (de-risk deployment) — LIVE: frontend on Vercel (fitsphere-two.vercel.app), API on Render, DB on Atlas; auth verified in prod
 
 ### Week 2 — Core Modules
-- [ ] Attendance (check-in/out, streaks, calendar) with optimistic updates
+- [x] Attendance (check-in/out, streaks, calendar) with optimistic updates + live occupancy
 - [ ] Occupancy engine + live indicator (polling)
 - [ ] Slot booking with capacity rules
 - [ ] Workout logging
