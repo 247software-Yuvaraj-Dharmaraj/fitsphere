@@ -8,7 +8,8 @@ import { AppLayout } from './components/AppLayout';
 import { LoginPage } from './pages/LoginPage';
 import { SignupPage } from './pages/SignupPage';
 import { AttendancePage } from './pages/AttendancePage';
-import { AnalyticsPage, DashboardPage, ProfilePage, SlotsPage } from './pages';
+import { SlotsPage } from './pages/SlotsPage';
+import { AnalyticsPage, DashboardPage, ProfilePage } from './pages';
 
 export default function App() {
   return (
