@@ -1,0 +1,13 @@
+# Local MongoDB for development. Start with: npm run db:up
+services:
+  mongo:
+    image: mongo:7
+    container_name: fitsphere-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - fitsphere_mongo_data:/data/db
+
+volumes:
+  fitsphere_mongo_data:

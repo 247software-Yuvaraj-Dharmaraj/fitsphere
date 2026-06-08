@@ -1,0 +1,25 @@
+# dependencies
+node_modules/
+
+# env / secrets — never commit; use .env.example as the template
+.env
+.env.local
+*.env
+
+# build output
+dist/
+build/
+client/dist/
+
+# logs
+*.log
+npm-debug.log*
+
+# editor / OS
+.DS_Store
+.vscode/
+.idea/
+
+# local db / docker volumes (regenerated via seed)
+*.db
+data/
