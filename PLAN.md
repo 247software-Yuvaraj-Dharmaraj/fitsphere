@@ -107,11 +107,11 @@ document-model decision worth being able to explain.
 - [x] Attendance (check-in/out, streaks, calendar) with optimistic updates + live occupancy
 - [ ] Occupancy engine + live indicator (polling)
 - [x] Slot booking with capacity rules (+ admin/trainer slot creation & deletion)
-- [ ] Workout logging
+- [x] Workout logging (type/duration, stats, recent)
 - [ ] Debounced search + AbortController wiring
 
 ### Week 3 — Dashboards, Polish, Deploy
-- [ ] Member dashboard (Recharts)
+- [x] Member dashboard (Recharts) — trend + workout-mix charts, stat cards, quick log; route code-splitting
 - [ ] Admin analytics
 - [ ] Trainer feedback timeline
 - [ ] Second locale, loading/error/empty states, skeletons

@@ -59,6 +59,24 @@
     "createdToast": "Slot created.",
     "deletedToast": "Slot deleted."
   },
+  "dashboard": {
+    "consistency": "Consistency",
+    "workoutsThisWeek": "Workouts / wk",
+    "visitsThisWeek": "Visits / wk",
+    "attendanceTrend": "Attendance trend",
+    "last14days": "Last 14 days",
+    "present": "Present",
+    "absent": "Absent",
+    "workoutMix": "Workout mix",
+    "noWorkouts": "No workouts logged yet.",
+    "logWorkout": "Log a workout",
+    "duration": "Duration",
+    "minutes": "min",
+    "log": "Log workout",
+    "loggedToast": "Workout logged!",
+    "recentWorkouts": "Recent workouts",
+    "types": { "CARDIO": "Cardio", "STRENGTH": "Strength", "MIXED": "Mixed" }
+  },
   "pages": {
     "dashboard": { "title": "Dashboard", "subtitle": "Your attendance and consistency at a glance." },
     "attendance": { "title": "Attendance", "subtitle": "Check in, track streaks, view your calendar." },

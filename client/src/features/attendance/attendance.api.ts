@@ -25,6 +25,21 @@ export interface MonthRecord {
   day: string; // YYYY-MM-DD
 }
 
+export interface AttendanceTrend {
+  days: number;
+  series: { day: string; present: number }[];
+  attendedDays: number;
+  consistency: number; // percent
+}
+
+export async function getTrend(days = 14, signal?: AbortSignal): Promise<AttendanceTrend> {
+  const { data } = await api.get<AttendanceTrend>('/attendance/trend', {
+    params: { days },
+    signal,
+  });
+  return data;
+}
+
 export async function getSummary(signal?: AbortSignal): Promise<AttendanceSummary> {
   const { data } = await api.get<AttendanceSummary>('/attendance/summary', { signal });
   return data;

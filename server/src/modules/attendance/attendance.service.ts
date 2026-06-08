@@ -101,6 +101,34 @@ export async function getSummary(userId: string) {
   };
 }
 
+// Last `days` days as a present/absent series, plus a consistency score
+// (% of days attended over the window). Powers the member dashboard.
+export async function getTrend(userId: string, days: number) {
+  const since = new Date();
+  since.setUTCHours(0, 0, 0, 0);
+  since.setUTCDate(since.getUTCDate() - (days - 1));
+
+  const records = await Attendance.find({
+    user: userId,
+    checkInAt: { $gte: since },
+  })
+    .select('checkInAt')
+    .lean();
+  const present = new Set(records.map((r) => dayKey(new Date(r.checkInAt as Date))));
+
+  const series: { day: string; present: number }[] = [];
+  const cursor = new Date(since);
+  for (let i = 0; i < days; i++) {
+    const key = dayKey(cursor);
+    series.push({ day: key, present: present.has(key) ? 1 : 0 });
+    cursor.setUTCDate(cursor.getUTCDate() + 1);
+  }
+
+  const attendedDays = series.filter((s) => s.present).length;
+  const consistency = Math.round((attendedDays / days) * 100);
+  return { days, series, attendedDays, consistency };
+}
+
 // Attendance days for a given month (calendar view). month is 1-12.
 export async function getMonth(userId: string, year: number, month: number) {
   const from = new Date(Date.UTC(year, month - 1, 1));
