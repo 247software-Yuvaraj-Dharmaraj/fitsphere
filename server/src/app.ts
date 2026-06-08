@@ -7,6 +7,7 @@ import attendanceRoutes from './modules/attendance/attendance.routes.js';
 import slotsRoutes from './modules/slots/slots.routes.js';
 import workoutsRoutes from './modules/workouts/workouts.routes.js';
 import analyticsRoutes from './modules/analytics/analytics.routes.js';
+import feedbackRoutes from './modules/feedback/feedback.routes.js';
 
 export function createApp() {
   const app = express();
@@ -23,6 +24,7 @@ export function createApp() {
   app.use('/api/slots', slotsRoutes);
   app.use('/api/workouts', workoutsRoutes);
   app.use('/api/analytics', analyticsRoutes);
+  app.use('/api/feedback', feedbackRoutes);
 
   // Error handler must be last.
   app.use(errorHandler);

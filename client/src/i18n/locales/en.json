@@ -98,6 +98,16 @@
     "noMembers": "No members found.",
     "statuses": { "ACTIVE": "Active", "AT_RISK": "At risk", "INACTIVE": "Inactive" }
   },
+  "profile": {
+    "feedbackFromTrainers": "Feedback from your trainers",
+    "noFeedback": "No feedback yet.",
+    "giveFeedback": "Give feedback",
+    "selectMember": "Select a member...",
+    "notePlaceholder": "Write weekly feedback for this member...",
+    "submit": "Send feedback",
+    "sentToast": "Feedback sent!",
+    "memberFeedback": "Feedback history"
+  },
   "pages": {
     "dashboard": { "title": "Dashboard", "subtitle": "Your attendance and consistency at a glance." },
     "attendance": { "title": "Attendance", "subtitle": "Check in, track streaks, view your calendar." },
