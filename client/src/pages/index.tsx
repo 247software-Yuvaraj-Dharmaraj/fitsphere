@@ -4,9 +4,6 @@ import { PagePlaceholder } from '../components/PagePlaceholder';
 export const DashboardPage = () => (
   <PagePlaceholder titleKey="pages.dashboard.title" subtitleKey="pages.dashboard.subtitle" />
 );
-export const AttendancePage = () => (
-  <PagePlaceholder titleKey="pages.attendance.title" subtitleKey="pages.attendance.subtitle" />
-);
 export const SlotsPage = () => (
   <PagePlaceholder titleKey="pages.slots.title" subtitleKey="pages.slots.subtitle" />
 );

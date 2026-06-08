@@ -1,0 +1,26 @@
+import type { Request, Response } from 'express';
+import * as service from './attendance.service.js';
+import { monthQuerySchema } from './attendance.schema.js';
+
+export async function checkIn(req: Request, res: Response) {
+  const record = await service.checkIn(req.user!.id);
+  res.status(201).json(record);
+}
+
+export async function checkOut(req: Request, res: Response) {
+  const record = await service.checkOut(req.user!.id);
+  res.json(record);
+}
+
+export async function summary(req: Request, res: Response) {
+  res.json(await service.getSummary(req.user!.id));
+}
+
+export async function month(req: Request, res: Response) {
+  const { year, month } = monthQuerySchema.parse(req.query);
+  res.json(await service.getMonth(req.user!.id, year, month));
+}
+
+export async function occupancy(_req: Request, res: Response) {
+  res.json(await service.getOccupancy());
+}
