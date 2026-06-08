@@ -106,7 +106,7 @@ document-model decision worth being able to explain.
 ### Week 2 — Core Modules
 - [x] Attendance (check-in/out, streaks, calendar) with optimistic updates + live occupancy
 - [ ] Occupancy engine + live indicator (polling)
-- [ ] Slot booking with capacity rules
+- [x] Slot booking with capacity rules (+ admin/trainer slot creation & deletion)
 - [ ] Workout logging
 - [ ] Debounced search + AbortController wiring
 

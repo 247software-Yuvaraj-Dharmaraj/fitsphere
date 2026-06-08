@@ -43,6 +43,22 @@
     "dayStreak": "{{count}}-day streak",
     "levels": { "LOW": "Low", "MEDIUM": "Medium", "HIGH": "High", "FULL": "Full" }
   },
+  "slots": {
+    "book": "Book",
+    "cancel": "Cancel",
+    "full": "Full",
+    "spotsLeft": "{{count}} spots left",
+    "noSlots": "No slots for this day.",
+    "startTime": "Start",
+    "endTime": "End",
+    "capacityLabel": "Capacity",
+    "add": "Add Slot",
+    "delete": "Delete slot",
+    "bookedToast": "Slot booked!",
+    "cancelledToast": "Booking cancelled.",
+    "createdToast": "Slot created.",
+    "deletedToast": "Slot deleted."
+  },
   "pages": {
     "dashboard": { "title": "Dashboard", "subtitle": "Your attendance and consistency at a glance." },
     "attendance": { "title": "Attendance", "subtitle": "Check in, track streaks, view your calendar." },

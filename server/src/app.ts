@@ -4,6 +4,7 @@ import { env } from './config/env.js';
 import { errorHandler } from './middleware/error.js';
 import authRoutes from './modules/auth/auth.routes.js';
 import attendanceRoutes from './modules/attendance/attendance.routes.js';
+import slotsRoutes from './modules/slots/slots.routes.js';
 
 export function createApp() {
   const app = express();
@@ -17,6 +18,7 @@ export function createApp() {
 
   app.use('/api/auth', authRoutes);
   app.use('/api/attendance', attendanceRoutes);
+  app.use('/api/slots', slotsRoutes);
 
   // Error handler must be last.
   app.use(errorHandler);
