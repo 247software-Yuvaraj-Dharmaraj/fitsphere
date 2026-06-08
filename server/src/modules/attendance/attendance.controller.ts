@@ -24,3 +24,8 @@ export async function month(req: Request, res: Response) {
 export async function occupancy(_req: Request, res: Response) {
   res.json(await service.getOccupancy());
 }
+
+export async function trend(req: Request, res: Response) {
+  const days = Math.min(90, Math.max(7, Number(req.query.days) || 14));
+  res.json(await service.getTrend(req.user!.id, days));
+}

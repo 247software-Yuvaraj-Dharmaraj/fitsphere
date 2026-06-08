@@ -5,7 +5,15 @@ import type { AttendanceSummary } from './attendance.api';
 export const attendanceKeys = {
   summary: ['attendance', 'summary'] as const,
   month: (year: number, month: number) => ['attendance', 'month', year, month] as const,
+  trend: (days: number) => ['attendance', 'trend', days] as const,
 };
+
+export function useAttendanceTrend(days = 14) {
+  return useQuery({
+    queryKey: attendanceKeys.trend(days),
+    queryFn: ({ signal }) => api.getTrend(days, signal),
+  });
+}
 
 // `signal` is forwarded to axios so navigating away cancels the request.
 export function useAttendanceSummary() {

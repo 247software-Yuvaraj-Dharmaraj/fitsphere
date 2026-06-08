@@ -59,6 +59,24 @@
     "createdToast": "நேரம் உருவாக்கப்பட்டது.",
     "deletedToast": "நேரம் நீக்கப்பட்டது."
   },
+  "dashboard": {
+    "consistency": "நிலைத்தன்மை",
+    "workoutsThisWeek": "பயிற்சி / வாரம்",
+    "visitsThisWeek": "வருகை / வாரம்",
+    "attendanceTrend": "வருகை போக்கு",
+    "last14days": "கடந்த 14 நாட்கள்",
+    "present": "வந்தது",
+    "absent": "வரவில்லை",
+    "workoutMix": "பயிற்சி வகைகள்",
+    "noWorkouts": "இன்னும் பயிற்சி பதிவு இல்லை.",
+    "logWorkout": "பயிற்சியைப் பதிவு செய்",
+    "duration": "கால அளவு",
+    "minutes": "நிமிடம்",
+    "log": "பதிவு செய்",
+    "loggedToast": "பயிற்சி பதிவு செய்யப்பட்டது!",
+    "recentWorkouts": "சமீபத்திய பயிற்சிகள்",
+    "types": { "CARDIO": "கார்டியோ", "STRENGTH": "வலிமை", "MIXED": "கலப்பு" }
+  },
   "pages": {
     "dashboard": { "title": "டாஷ்போர்டு", "subtitle": "உங்கள் வருகை மற்றும் நிலைத்தன்மை ஒரே பார்வையில்." },
     "attendance": { "title": "வருகை", "subtitle": "செக்-இன் செய்யுங்கள், தொடர்ச்சியைக் கண்காணிக்கவும்." },
