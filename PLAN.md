@@ -113,7 +113,7 @@ document-model decision worth being able to explain.
 ### Week 3 — Dashboards, Polish, Deploy
 - [x] Member dashboard (Recharts) — trend + workout-mix charts, stat cards, quick log; route code-splitting
 - [x] Admin analytics — peak hours, daily trend, member directory w/ engagement status + debounced search
-- [ ] Trainer feedback timeline
+- [x] Trainer feedback timeline (+ Profile page as the hub: member timeline / staff give-feedback)
 - [ ] Second locale, loading/error/empty states, skeletons
 - [ ] README with screenshots + architecture diagram
 - [ ] Final deploy (frontend: Vercel/Netlify, backend: Render/Railway, DB: MongoDB Atlas)

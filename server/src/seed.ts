@@ -2,7 +2,7 @@
 // Run with: npm run seed
 import bcrypt from 'bcryptjs';
 import { connectDb, disconnectDb } from './lib/db.js';
-import { GymConfig, Slot, User } from './models/index.js';
+import { Feedback, GymConfig, Slot, User } from './models/index.js';
 
 const DEMO_PASSWORD = 'password123';
 
@@ -15,13 +15,16 @@ const demoUsers = [
 async function main() {
   await connectDb();
 
-  console.log('[seed] clearing existing users, gym config, slots...');
+  console.log('[seed] clearing existing users, gym config, slots, feedback...');
   await User.deleteMany({});
   await GymConfig.deleteMany({});
   await Slot.deleteMany({});
+  await Feedback.deleteMany({});
 
   const passwordHash = await bcrypt.hash(DEMO_PASSWORD, 10);
-  await User.insertMany(demoUsers.map((u) => ({ ...u, passwordHash })));
+  const created = await User.insertMany(demoUsers.map((u) => ({ ...u, passwordHash })));
+  const member = created.find((u) => u.role === 'MEMBER');
+  const trainer = created.find((u) => u.role === 'TRAINER');
 
   await GymConfig.create({ name: 'FitSphere Gym', capacity: 50 });
 
@@ -43,6 +46,20 @@ async function main() {
   }
   await Slot.insertMany(slots);
   console.log('[seed] created %d slots across 3 days', slots.length);
+
+  // One demo feedback so the member's timeline isn't empty.
+  if (member && trainer) {
+    const weekOf = new Date();
+    weekOf.setUTCDate(weekOf.getUTCDate() - weekOf.getUTCDay());
+    weekOf.setUTCHours(0, 0, 0, 0);
+    await Feedback.create({
+      trainer: trainer._id,
+      member: member._id,
+      note: 'Great consistency this week! Try adding one more strength session next week.',
+      weekOf,
+    });
+    console.log('[seed] created 1 demo feedback');
+  }
 
   console.log('[seed] done. Demo accounts (password: %s):', DEMO_PASSWORD);
   demoUsers.forEach((u) => console.log(`  - ${u.role.padEnd(7)} ${u.email}`));

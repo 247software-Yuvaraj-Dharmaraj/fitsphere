@@ -21,7 +21,9 @@ const SlotsPage = lazy(() => import('./pages/SlotsPage').then((m) => ({ default:
 const AnalyticsPage = lazy(() =>
   import('./pages/AnalyticsPage').then((m) => ({ default: m.AnalyticsPage })),
 );
-const ProfilePage = lazy(() => import('./pages').then((m) => ({ default: m.ProfilePage })));
+const ProfilePage = lazy(() =>
+  import('./pages/ProfilePage').then((m) => ({ default: m.ProfilePage })),
+);
 
 function PageFallback() {
   return <div className="flex h-64 items-center justify-center text-slate-400">Loading...</div>;
