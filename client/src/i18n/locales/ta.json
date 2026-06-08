@@ -77,6 +77,27 @@
     "recentWorkouts": "சமீபத்திய பயிற்சிகள்",
     "types": { "CARDIO": "கார்டியோ", "STRENGTH": "வலிமை", "MIXED": "கலப்பு" }
   },
+  "analytics": {
+    "totalMembers": "உறுப்பினர்கள்",
+    "activeThisWeek": "செயலில் / வாரம்",
+    "peakHour": "உச்ச நேரம்",
+    "currentOccupancy": "நெரிசல்",
+    "peakHours": "உச்ச நேரங்கள்",
+    "last30days": "கடந்த 30 நாட்கள்",
+    "checkIns": "செக்-இன்கள்",
+    "dailyTrend": "தினசரி செக்-இன்கள்",
+    "last14days": "கடந்த 14 நாட்கள்",
+    "members": "உறுப்பினர்கள்",
+    "searchPlaceholder": "உறுப்பினர்களைத் தேடு...",
+    "member": "உறுப்பினர்",
+    "visits": "வருகைகள்",
+    "thisWeek": "இந்த வாரம்",
+    "lastVisit": "கடைசி வருகை",
+    "status": "நிலை",
+    "never": "இல்லை",
+    "noMembers": "உறுப்பினர்கள் இல்லை.",
+    "statuses": { "ACTIVE": "செயலில்", "AT_RISK": "அபாயத்தில்", "INACTIVE": "செயலற்ற" }
+  },
   "pages": {
     "dashboard": { "title": "டாஷ்போர்டு", "subtitle": "உங்கள் வருகை மற்றும் நிலைத்தன்மை ஒரே பார்வையில்." },
     "attendance": { "title": "வருகை", "subtitle": "செக்-இன் செய்யுங்கள், தொடர்ச்சியைக் கண்காணிக்கவும்." },

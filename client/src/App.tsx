@@ -19,7 +19,7 @@ const AttendancePage = lazy(() =>
 );
 const SlotsPage = lazy(() => import('./pages/SlotsPage').then((m) => ({ default: m.SlotsPage })));
 const AnalyticsPage = lazy(() =>
-  import('./pages').then((m) => ({ default: m.AnalyticsPage })),
+  import('./pages/AnalyticsPage').then((m) => ({ default: m.AnalyticsPage })),
 );
 const ProfilePage = lazy(() => import('./pages').then((m) => ({ default: m.ProfilePage })));
 
