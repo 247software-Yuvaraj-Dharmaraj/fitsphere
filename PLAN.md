@@ -101,7 +101,7 @@ document-model decision worth being able to explain.
 - [x] Mongoose models + seed script (demo users for each role)
 - [x] Auth module (signup/signin/refresh/logout/me) end-to-end — verified against Atlas
 - [x] Client shell: routing, layout, TanStack Query + i18n setup, auth pages + guards
-- [ ] Early deploy of a "hello world" (de-risk deployment)
+- [x] Early deploy (de-risk deployment) — LIVE: frontend on Vercel (fitsphere-two.vercel.app), API on Render, DB on Atlas; auth verified in prod
 
 ### Week 2 — Core Modules
 - [ ] Attendance (check-in/out, streaks, calendar) with optimistic updates

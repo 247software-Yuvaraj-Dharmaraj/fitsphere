@@ -4,7 +4,7 @@ A full-stack gym attendance, occupancy & engagement platform — built as a
 production-style demonstration of a modern **React + Node + MongoDB** stack with
 role-based access control.
 
-> **Live demo:** _coming soon_
+> **Live demo:** https://fitsphere-two.vercel.app
 > **Demo logins** (password `password123`): `member@fitsphere.app` · `trainer@fitsphere.app` · `admin@fitsphere.app`
 
 ## Why FitSphere
