@@ -1,0 +1,121 @@
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import {
+  LayoutDashboard,
+  CalendarCheck,
+  CalendarClock,
+  BarChart3,
+  User as UserIcon,
+  LogOut,
+  Dumbbell,
+} from 'lucide-react';
+import type { ComponentType } from 'react';
+import { useAuth } from '../features/auth/useAuth';
+import type { Role } from '../features/auth/auth.types';
+import { LanguageSwitcher } from './LanguageSwitcher';
+
+interface NavItem {
+  to: string;
+  labelKey: string;
+  icon: ComponentType<{ size?: number }>;
+  roles?: Role[]; // undefined = all roles
+}
+
+const NAV_ITEMS: NavItem[] = [
+  { to: '/dashboard', labelKey: 'nav.dashboard', icon: LayoutDashboard },
+  { to: '/attendance', labelKey: 'nav.attendance', icon: CalendarCheck },
+  { to: '/slots', labelKey: 'nav.slots', icon: CalendarClock },
+  { to: '/analytics', labelKey: 'nav.analytics', icon: BarChart3, roles: ['TRAINER', 'ADMIN'] },
+  { to: '/profile', labelKey: 'nav.profile', icon: UserIcon },
+];
+
+export function AppLayout() {
+  const { t } = useTranslation();
+  const { user, signout } = useAuth();
+  const navigate = useNavigate();
+
+  const items = NAV_ITEMS.filter((i) => !i.roles || (user && i.roles.includes(user.role)));
+
+  async function handleSignout() {
+    await signout();
+    navigate('/login', { replace: true });
+  }
+
+  return (
+    <div className="flex min-h-screen flex-col">
+      {/* Header */}
+      <header className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3">
+        <div className="flex items-center gap-2 font-semibold text-brand-700">
+          <Dumbbell size={22} />
+          <span>{t('app.name')}</span>
+        </div>
+        <div className="flex items-center gap-4">
+          <LanguageSwitcher />
+          {user && (
+            <span className="hidden text-sm text-slate-600 sm:inline">
+              {user.name} · <span className="text-slate-400">{t(`roles.${user.role}`)}</span>
+            </span>
+          )}
+          <button
+            onClick={handleSignout}
+            className="flex items-center gap-1 rounded-md px-2 py-1 text-sm text-slate-500 hover:bg-slate-100 hover:text-slate-800"
+          >
+            <LogOut size={16} />
+            <span className="hidden sm:inline">{t('auth.signOut')}</span>
+          </button>
+        </div>
+      </header>
+
+      <div className="flex flex-1">
+        {/* Sidebar (desktop) */}
+        <aside className="hidden w-56 shrink-0 border-r border-slate-200 bg-white p-3 md:block">
+          <nav className="space-y-1">
+            {items.map((item) => (
+              <NavItemLink key={item.to} item={item} />
+            ))}
+          </nav>
+        </aside>
+
+        {/* Main content */}
+        <main className="flex-1 p-4 pb-20 md:p-8 md:pb-8">
+          <Outlet />
+        </main>
+      </div>
+
+      {/* Bottom nav (mobile) */}
+      <nav className="fixed inset-x-0 bottom-0 z-10 flex border-t border-slate-200 bg-white md:hidden">
+        {items.map((item) => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            className={({ isActive }) =>
+              `flex flex-1 flex-col items-center gap-0.5 py-2 text-xs ${
+                isActive ? 'text-brand-600' : 'text-slate-400'
+              }`
+            }
+          >
+            <item.icon size={20} />
+            {t(item.labelKey)}
+          </NavLink>
+        ))}
+      </nav>
+    </div>
+  );
+}
+
+function NavItemLink({ item }: { item: NavItem }) {
+  const { t } = useTranslation();
+  return (
+    <NavLink
+      to={item.to}
+      className={({ isActive }) =>
+        `flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium ${
+          isActive ? 'bg-brand-50 text-brand-700' : 'text-slate-600 hover:bg-slate-100'
+        }`
+      }
+    >
+      <item.icon size={18} />
+      {t(item.labelKey)}
+    </NavLink>
+  );
+}

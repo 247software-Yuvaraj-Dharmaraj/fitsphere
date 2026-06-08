@@ -1,0 +1,36 @@
+{
+  "app": { "name": "FitSphere", "tagline": "Train smarter. Beat the crowd." },
+  "nav": {
+    "dashboard": "Dashboard",
+    "attendance": "Attendance",
+    "slots": "Slots",
+    "analytics": "Analytics",
+    "profile": "Profile"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Sign Out",
+    "name": "Name",
+    "email": "Email",
+    "mobile": "Mobile (optional)",
+    "password": "Password",
+    "role": "Role",
+    "haveAccount": "Already have an account?",
+    "noAccount": "Don't have an account?",
+    "signingIn": "Signing in...",
+    "creatingAccount": "Creating account...",
+    "welcomeBack": "Welcome back",
+    "createAccount": "Create your account",
+    "demoHint": "Demo: admin@fitsphere.app / password123"
+  },
+  "roles": { "MEMBER": "Member", "TRAINER": "Trainer", "ADMIN": "Admin" },
+  "common": { "loading": "Loading...", "comingSoon": "Coming soon", "language": "Language" },
+  "pages": {
+    "dashboard": { "title": "Dashboard", "subtitle": "Your attendance and consistency at a glance." },
+    "attendance": { "title": "Attendance", "subtitle": "Check in, track streaks, view your calendar." },
+    "slots": { "title": "Workout Slots", "subtitle": "Book a slot and beat peak hours." },
+    "analytics": { "title": "Analytics", "subtitle": "Gym usage, peak hours, and engagement." },
+    "profile": { "title": "Profile", "subtitle": "Manage your account." }
+  }
+}
