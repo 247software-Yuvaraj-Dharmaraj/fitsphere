@@ -1,0 +1,25 @@
+# Render Blueprint for the FitSphere API (backend).
+# In Render: New + → Blueprint → connect this repo. Secrets (sync: false) are
+# entered in the dashboard, never committed.
+services:
+  - type: web
+    name: fitsphere-api
+    runtime: node
+    plan: free
+    rootDir: server
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: MONGODB_URI
+        sync: false # paste your MongoDB Atlas URI in the dashboard
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: ACCESS_TOKEN_TTL
+        value: 15m
+      - key: REFRESH_TOKEN_TTL
+        value: 7d
+      - key: CLIENT_ORIGIN
+        sync: false # set to your deployed frontend URL (e.g. https://fitsphere.vercel.app)
