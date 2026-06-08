@@ -100,7 +100,7 @@ document-model decision worth being able to explain.
 - [x] Server skeleton: env, mongoose connection, error/auth middleware, JWT utils
 - [x] Mongoose models + seed script (demo users for each role)
 - [x] Auth module (signup/signin/refresh/logout/me) end-to-end — verified against Atlas
-- [ ] Client shell: routing, layout, TanStack Query + i18n setup, auth pages + guards
+- [x] Client shell: routing, layout, TanStack Query + i18n setup, auth pages + guards
 - [ ] Early deploy of a "hello world" (de-risk deployment)
 
 ### Week 2 — Core Modules
