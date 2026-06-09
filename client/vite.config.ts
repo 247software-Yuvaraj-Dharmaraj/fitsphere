@@ -12,6 +12,12 @@ export default defineConfig({
         target: 'http://localhost:4001',
         changeOrigin: true,
       },
+      // Proxy the Socket.IO websocket to the API in dev (same-origin client).
+      '/socket.io': {
+        target: 'http://localhost:4001',
+        changeOrigin: true,
+        ws: true,
+      },
     },
   },
 });
