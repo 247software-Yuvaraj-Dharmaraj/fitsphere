@@ -6,6 +6,7 @@ import { queryClient } from './lib/queryClient';
 import { ThemeProvider } from './context/theme-context';
 import { DensityProvider } from './context/density-context';
 import { AuthProvider } from './features/auth/AuthContext';
+import { ErrorBoundary } from './components/error-boundary';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AppLayout } from './components/AppLayout';
 import { LoginPage } from './pages/LoginPage';
@@ -35,6 +36,7 @@ export default function App() {
   return (
     <ThemeProvider>
       <DensityProvider>
+        <ErrorBoundary>
         <QueryClientProvider client={queryClient}>
           <BrowserRouter>
             <AuthProvider>
@@ -67,6 +69,7 @@ export default function App() {
             </AuthProvider>
           </BrowserRouter>
         </QueryClientProvider>
+        </ErrorBoundary>
       </DensityProvider>
     </ThemeProvider>
   );

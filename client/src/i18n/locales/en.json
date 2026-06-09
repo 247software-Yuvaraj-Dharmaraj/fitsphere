@@ -32,7 +32,10 @@
     "cancel": "Cancel",
     "save": "Save",
     "selected": "selected",
-    "clear": "Clear"
+    "clear": "Clear",
+    "errorTitle": "Something went wrong",
+    "errorMessage": "An unexpected error occurred. Please reload the page.",
+    "reload": "Reload"
   },
   "attendance": {
     "checkIn": "Check In",
@@ -111,6 +114,7 @@
     "last14days": "Last 14 days",
     "members": "Members",
     "searchPlaceholder": "Search members...",
+    "exportCsv": "Export CSV",
     "member": "Member",
     "visits": "Visits",
     "thisWeek": "This week",

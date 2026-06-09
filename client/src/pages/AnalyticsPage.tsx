@@ -11,10 +11,12 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { Search, Users, Activity, Clock, Gauge } from 'lucide-react';
+import { Search, Users, Activity, Clock, Gauge, Download } from 'lucide-react';
 import { useAnalyticsOverview, useMembers } from '../features/analytics/analytics.hooks';
-import type { MemberRow, MemberStatus } from '../features/analytics/analytics.api';
+import { getMembers, type MemberRow, type MemberStatus } from '../features/analytics/analytics.api';
 import { useDebounce } from '../lib/useDebounce';
+import { downloadCsv } from '../lib/csv';
+import { Button } from '../components/ui/button';
 import { SkeletonCard, SkeletonPanel } from '../components/Skeleton';
 import { PageHeader } from '../components/ui/page-header';
 import { Card } from '../components/ui/card';
@@ -56,6 +58,34 @@ export function AnalyticsPage() {
     setSorting((prev) => (typeof updater === 'function' ? updater(prev) : updater));
     setPage(0);
   };
+
+  const [exporting, setExporting] = useState(false);
+  async function exportCsv() {
+    setExporting(true);
+    try {
+      const all = await getMembers({
+        q: debounced,
+        page: 0,
+        pageSize: 100,
+        sort: sortState.id as 'name' | 'totalVisits' | 'thisWeek' | 'lastVisit' | 'status',
+        dir: sortState.desc ? 'desc' : 'asc',
+      });
+      downloadCsv(
+        'fitsphere-members.csv',
+        [
+          { key: 'name', header: 'Name' },
+          { key: 'email', header: 'Email' },
+          { key: 'totalVisits', header: 'Total Visits' },
+          { key: 'thisWeek', header: 'This Week' },
+          { key: 'lastVisit', header: 'Last Visit' },
+          { key: 'status', header: 'Status' },
+        ],
+        all.rows,
+      );
+    } finally {
+      setExporting(false);
+    }
+  }
 
   const o = overview.data;
   const peakLabel = o?.totals.peakHour != null ? `${o.totals.peakHour}:00` : '—';
@@ -158,14 +188,20 @@ export function AnalyticsPage() {
           <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-200">
             {t('analytics.members')}
           </h2>
-          <div className="relative">
-            <Search size={15} className="absolute top-2.5 left-2 text-slate-400" />
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder={t('analytics.searchPlaceholder')}
-              className={`${fieldClasses} pl-8`}
-            />
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <Search size={15} className="absolute top-2.5 left-2 text-slate-400" />
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={t('analytics.searchPlaceholder')}
+                className={`${fieldClasses} pl-8`}
+              />
+            </div>
+            <Button variant="secondary" size="sm" onClick={exportCsv} disabled={exporting}>
+              <Download size={14} />
+              {t('analytics.exportCsv')}
+            </Button>
           </div>
         </div>
         <DataGrid
