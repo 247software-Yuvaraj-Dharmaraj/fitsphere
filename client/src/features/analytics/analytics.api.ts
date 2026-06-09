@@ -25,7 +25,22 @@ export async function getOverview(signal?: AbortSignal): Promise<AnalyticsOvervi
   return data;
 }
 
-export async function getMembers(q: string, signal?: AbortSignal): Promise<MemberRow[]> {
-  const { data } = await api.get<MemberRow[]>('/analytics/members', { params: { q }, signal });
+export interface MembersQuery {
+  q: string;
+  page: number;
+  pageSize: number;
+  sort: 'name' | 'totalVisits' | 'thisWeek' | 'lastVisit' | 'status';
+  dir: 'asc' | 'desc';
+}
+
+export interface MembersPage {
+  rows: MemberRow[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+export async function getMembers(query: MembersQuery, signal?: AbortSignal): Promise<MembersPage> {
+  const { data } = await api.get<MembersPage>('/analytics/members', { params: query, signal });
   return data;
 }

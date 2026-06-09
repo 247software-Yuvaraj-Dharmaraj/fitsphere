@@ -61,4 +61,25 @@ describe('analytics', () => {
     expect(ok.status).toBe(200);
     expect(ok.body.peakHours).toHaveLength(24);
   });
+
+  it('members directory is paginated, searchable, and sorted server-side', async () => {
+    const admin = await makeUser('ADMIN');
+    await makeUser('MEMBER', 'aaa@test.app');
+    await makeUser('MEMBER', 'bbb@test.app');
+    await makeUser('MEMBER', 'ccc@test.app');
+
+    const page = await request(app)
+      .get('/api/analytics/members?page=0&pageSize=2&sort=name&dir=asc')
+      .set(auth(admin.token));
+    expect(page.status).toBe(200);
+    expect(page.body.total).toBe(3);
+    expect(page.body.rows).toHaveLength(2); // pageSize honored
+
+    const search = await request(app)
+      .get('/api/analytics/members?q=bbb')
+      .set(auth(admin.token));
+    expect(search.body.total).toBe(1);
+    expect(search.body.rows[0].email).toBe('bbb@test.app');
+    expect(search.body.rows[0].status).toBe('INACTIVE'); // never checked in
+  });
 });

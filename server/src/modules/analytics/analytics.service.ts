@@ -1,5 +1,6 @@
 import { Attendance, User } from '../../models/index.js';
 import { getOccupancy } from '../attendance/attendance.service.js';
+import type { MembersQuery } from './analytics.schema.js';
 
 function daysAgo(n: number): Date {
   const d = new Date();
@@ -71,54 +72,102 @@ export async function overview() {
   };
 }
 
-type MemberStatus = 'ACTIVE' | 'AT_RISK' | 'INACTIVE';
-function statusFor(lastVisit: Date | null): MemberStatus {
-  if (!lastVisit) return 'INACTIVE';
-  const ageDays = (Date.now() - new Date(lastVisit).getTime()) / 86_400_000;
-  if (ageDays <= 7) return 'ACTIVE';
-  if (ageDays <= 14) return 'AT_RISK';
-  return 'INACTIVE';
+interface MemberRowAgg {
+  _id: unknown;
+  name: string;
+  email: string;
+  totalVisits: number;
+  thisWeek: number;
+  lastVisit: Date | null;
+  status: 'ACTIVE' | 'AT_RISK' | 'INACTIVE';
 }
 
-// Member directory with engagement stats; supports search (debounced on client).
-export async function members(query: string) {
-  const filter: Record<string, unknown> = { role: 'MEMBER' };
-  if (query.trim()) {
-    const rx = new RegExp(query.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
-    filter.$or = [{ name: rx }, { email: rx }];
+// Server-side member directory: search + sort + pagination computed in a single
+// aggregation (mirrors ui-service's server-driven DataGrid). Returns the page of
+// rows plus the total count.
+export async function members(query: MembersQuery) {
+  const { q, page, pageSize, sort, dir } = query;
+  const weekStart = startOfWeek();
+  const now = new Date();
+
+  const match: Record<string, unknown> = { role: 'MEMBER' };
+  if (q.trim()) {
+    const rx = new RegExp(q.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+    match.$or = [{ name: rx }, { email: rx }];
   }
 
-  const users = await User.find(filter).select('name email').limit(50).lean();
-  const ids = users.map((u) => u._id);
-  const weekStart = startOfWeek();
+  // status sorts by recency rank, not the string.
+  const sortKey = sort === 'status' ? 'statusRank' : sort;
+  const sortDir = dir === 'asc' ? 1 : -1;
 
-  const [totals, weekly] = await Promise.all([
-    Attendance.aggregate<{ _id: unknown; totalVisits: number; lastVisit: Date }>([
-      { $match: { user: { $in: ids } } },
-      { $group: { _id: '$user', totalVisits: { $sum: 1 }, lastVisit: { $max: '$checkInAt' } } },
-    ]),
-    Attendance.aggregate<{ _id: unknown; count: number }>([
-      { $match: { user: { $in: ids }, checkInAt: { $gte: weekStart } } },
-      { $group: { _id: '$user', count: { $sum: 1 } } },
-    ]),
+  const [result] = await User.aggregate([
+    { $match: match },
+    {
+      $lookup: { from: 'attendances', localField: '_id', foreignField: 'user', as: 'att' },
+    },
+    {
+      $addFields: {
+        totalVisits: { $size: '$att' },
+        lastVisit: { $max: '$att.checkInAt' },
+        thisWeek: {
+          $size: {
+            $filter: { input: '$att', as: 'a', cond: { $gte: ['$$a.checkInAt', weekStart] } },
+          },
+        },
+      },
+    },
+    {
+      $addFields: {
+        ageDays: {
+          $cond: [
+            { $eq: ['$lastVisit', null] },
+            99999,
+            { $divide: [{ $subtract: [now, '$lastVisit'] }, 86_400_000] },
+          ],
+        },
+      },
+    },
+    {
+      $addFields: {
+        status: {
+          $switch: {
+            branches: [
+              { case: { $lte: ['$ageDays', 7] }, then: 'ACTIVE' },
+              { case: { $lte: ['$ageDays', 14] }, then: 'AT_RISK' },
+            ],
+            default: 'INACTIVE',
+          },
+        },
+        statusRank: {
+          $switch: {
+            branches: [
+              { case: { $lte: ['$ageDays', 7] }, then: 0 },
+              { case: { $lte: ['$ageDays', 14] }, then: 1 },
+            ],
+            default: 2,
+          },
+        },
+      },
+    },
+    { $project: { name: 1, email: 1, totalVisits: 1, thisWeek: 1, lastVisit: 1, status: 1, statusRank: 1 } },
+    {
+      $facet: {
+        rows: [{ $sort: { [sortKey]: sortDir, _id: 1 } }, { $skip: page * pageSize }, { $limit: pageSize }],
+        total: [{ $count: 'count' }],
+      },
+    },
   ]);
 
-  const totalMap = new Map(totals.map((t) => [String(t._id), t]));
-  const weekMap = new Map(weekly.map((w) => [String(w._id), w.count]));
+  const rows = (result.rows as MemberRowAgg[]).map((r) => ({
+    id: String(r._id),
+    name: r.name,
+    email: r.email,
+    totalVisits: r.totalVisits,
+    thisWeek: r.thisWeek,
+    lastVisit: r.lastVisit ?? null,
+    status: r.status,
+  }));
+  const total = (result.total[0]?.count as number) ?? 0;
 
-  return users
-    .map((u) => {
-      const t = totalMap.get(String(u._id));
-      const lastVisit = t?.lastVisit ?? null;
-      return {
-        id: String(u._id),
-        name: u.name,
-        email: u.email,
-        totalVisits: t?.totalVisits ?? 0,
-        thisWeek: weekMap.get(String(u._id)) ?? 0,
-        lastVisit,
-        status: statusFor(lastVisit),
-      };
-    })
-    .sort((a, b) => b.totalVisits - a.totalVisits);
+  return { rows, total, page, pageSize };
 }
