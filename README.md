@@ -31,6 +31,18 @@ data-driven dashboards.
 - ⚡ **Optimistic updates & smart caching** — via TanStack Query, with request
   cancellation (AbortController) and debounced search
 
+## Screenshots
+
+> Drop PNGs into `screenshots/` with these names and they'll render here.
+
+| Member Dashboard | Admin Analytics |
+|---|---|
+| ![Dashboard](screenshots/dashboard.png) | ![Analytics](screenshots/analytics.png) |
+
+| Attendance & Streaks | Slot Booking |
+|---|---|
+| ![Attendance](screenshots/attendance.png) | ![Slots](screenshots/slots.png) |
+
 ## Tech Stack
 
 | Layer    | Technology |

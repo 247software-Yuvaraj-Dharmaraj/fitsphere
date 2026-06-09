@@ -14,6 +14,7 @@ import { Search, Users, Activity, Clock, Gauge } from 'lucide-react';
 import { useAnalyticsOverview, useMembers } from '../features/analytics/analytics.hooks';
 import type { MemberStatus } from '../features/analytics/analytics.api';
 import { useDebounce } from '../lib/useDebounce';
+import { SkeletonCard, SkeletonPanel } from '../components/Skeleton';
 
 const STATUS_STYLES: Record<MemberStatus, string> = {
   ACTIVE: 'bg-green-100 text-green-700',
@@ -41,14 +42,28 @@ export function AnalyticsPage() {
       </header>
 
       {/* KPIs */}
+      {overview.isLoading ? (
+        <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <SkeletonCard key={i} />
+          ))}
+        </section>
+      ) : (
       <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Kpi icon={<Users size={18} className="text-brand-600" />} label={t('analytics.totalMembers')} value={o ? `${o.totals.totalMembers}` : '—'} />
         <Kpi icon={<Activity size={18} className="text-green-600" />} label={t('analytics.activeThisWeek')} value={o ? `${o.totals.activeThisWeek}` : '—'} />
         <Kpi icon={<Clock size={18} className="text-orange-500" />} label={t('analytics.peakHour')} value={peakLabel} />
         <Kpi icon={<Gauge size={18} className="text-slate-600" />} label={t('analytics.currentOccupancy')} value={o ? `${o.occupancy.percent}%` : '—'} />
       </section>
+      )}
 
       {/* Charts */}
+      {overview.isLoading ? (
+        <section className="grid gap-4 lg:grid-cols-2">
+          <SkeletonPanel height={220} />
+          <SkeletonPanel height={220} />
+        </section>
+      ) : (
       <section className="grid gap-4 lg:grid-cols-2">
         <Card title={t('analytics.peakHours')} subtitle={t('analytics.last30days')}>
           <ResponsiveContainer width="100%" height={220}>
@@ -76,6 +91,7 @@ export function AnalyticsPage() {
           </ResponsiveContainer>
         </Card>
       </section>
+      )}
 
       {/* Member directory + debounced search */}
       <section className="rounded-xl border border-slate-200 bg-white p-4">

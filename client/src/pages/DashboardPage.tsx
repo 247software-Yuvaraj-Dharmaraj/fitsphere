@@ -11,8 +11,13 @@ import {
   Tooltip,
   XAxis,
 } from 'recharts';
-import { Flame, Target, Dumbbell, CalendarCheck } from 'lucide-react';
-import { useAttendanceSummary, useAttendanceTrend } from '../features/attendance/attendance.hooks';
+import { Flame, Target, Dumbbell, CalendarCheck, Clock } from 'lucide-react';
+import {
+  useAttendanceSummary,
+  useAttendanceTrend,
+  useBestTime,
+} from '../features/attendance/attendance.hooks';
+import { Skeleton, SkeletonCard, SkeletonPanel } from '../components/Skeleton';
 import {
   useLogWorkout,
   useRecentWorkouts,
@@ -34,6 +39,13 @@ export function DashboardPage() {
   const trend = useAttendanceTrend(14);
   const stats = useWorkoutStats();
   const recent = useRecentWorkouts(5);
+  const bestTime = useBestTime();
+
+  const formatHour = (h: number) =>
+    new Intl.DateTimeFormat(i18n.resolvedLanguage ?? 'en', {
+      hour: 'numeric',
+      timeZone: 'UTC',
+    }).format(new Date(Date.UTC(2024, 0, 1, h)));
 
   const trendData =
     trend.data?.series.map((s) => ({ label: s.day.slice(8), present: s.present })) ?? [];
@@ -52,29 +64,60 @@ export function DashboardPage() {
 
       {/* Stat cards */}
       <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard
-          icon={<Flame size={18} className="text-orange-500" />}
-          label={t('attendance.streak')}
-          value={summary.data ? `${summary.data.streak}` : '—'}
-        />
-        <StatCard
-          icon={<Target size={18} className="text-brand-600" />}
-          label={t('dashboard.consistency')}
-          value={trend.data ? `${trend.data.consistency}%` : '—'}
-        />
-        <StatCard
-          icon={<Dumbbell size={18} className="text-slate-600" />}
-          label={t('dashboard.workoutsThisWeek')}
-          value={stats.data ? `${stats.data.thisWeekSessions}` : '—'}
-        />
-        <StatCard
-          icon={<CalendarCheck size={18} className="text-green-600" />}
-          label={t('dashboard.visitsThisWeek')}
-          value={summary.data ? `${summary.data.totals.thisWeek}` : '—'}
-        />
+        {summary.isLoading || trend.isLoading || stats.isLoading ? (
+          Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
+        ) : (
+          <>
+            <StatCard
+              icon={<Flame size={18} className="text-orange-500" />}
+              label={t('attendance.streak')}
+              value={summary.data ? `${summary.data.streak}` : '—'}
+            />
+            <StatCard
+              icon={<Target size={18} className="text-brand-600" />}
+              label={t('dashboard.consistency')}
+              value={trend.data ? `${trend.data.consistency}%` : '—'}
+            />
+            <StatCard
+              icon={<Dumbbell size={18} className="text-slate-600" />}
+              label={t('dashboard.workoutsThisWeek')}
+              value={stats.data ? `${stats.data.thisWeekSessions}` : '—'}
+            />
+            <StatCard
+              icon={<CalendarCheck size={18} className="text-green-600" />}
+              label={t('dashboard.visitsThisWeek')}
+              value={summary.data ? `${summary.data.totals.thisWeek}` : '—'}
+            />
+          </>
+        )}
+      </section>
+
+      {/* Best time to train */}
+      <section className="flex flex-wrap items-center gap-3 rounded-xl border border-brand-100 bg-brand-50 p-4">
+        <Clock size={20} className="text-brand-600" />
+        {bestTime.isLoading ? (
+          <Skeleton className="h-5 w-64" />
+        ) : bestTime.data?.suggestion != null ? (
+          <p className="text-sm text-slate-700">
+            <span className="font-semibold">{t('dashboard.bestTime')}:</span>{' '}
+            {t('dashboard.bestTimeHint', { time: formatHour(bestTime.data.suggestion) })}
+            <span className="ml-2 text-slate-500">
+              ({t('dashboard.quietHours')}:{' '}
+              {bestTime.data.quietest.map((q) => formatHour(q.hour)).join(', ')})
+            </span>
+          </p>
+        ) : (
+          <p className="text-sm text-slate-500">{t('dashboard.bestTimeNoData')}</p>
+        )}
       </section>
 
       {/* Charts */}
+      {trend.isLoading || stats.isLoading ? (
+        <section className="grid gap-4 lg:grid-cols-2">
+          <SkeletonPanel />
+          <SkeletonPanel />
+        </section>
+      ) : (
       <section className="grid gap-4 lg:grid-cols-2">
         <Card title={t('dashboard.attendanceTrend')} subtitle={t('dashboard.last14days')}>
           <ResponsiveContainer width="100%" height={200}>
@@ -119,6 +162,7 @@ export function DashboardPage() {
           )}
         </Card>
       </section>
+      )}
 
       {/* Quick log + recent */}
       <section className="grid gap-4 lg:grid-cols-2">

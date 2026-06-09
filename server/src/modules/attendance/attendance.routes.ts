@@ -13,5 +13,6 @@ router.get('/summary', asyncHandler(controller.summary));
 router.get('/month', asyncHandler(controller.month));
 router.get('/occupancy', asyncHandler(controller.occupancy));
 router.get('/trend', asyncHandler(controller.trend));
+router.get('/best-time', asyncHandler(controller.bestTime));
 
 export default router;

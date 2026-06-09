@@ -15,6 +15,13 @@ export function useAttendanceTrend(days = 14) {
   });
 }
 
+export function useBestTime() {
+  return useQuery({
+    queryKey: ['attendance', 'best-time'] as const,
+    queryFn: ({ signal }) => api.getBestTime(signal),
+  });
+}
+
 // `signal` is forwarded to axios so navigating away cancels the request.
 export function useAttendanceSummary() {
   return useQuery({
