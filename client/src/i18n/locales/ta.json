@@ -75,6 +75,10 @@
     "log": "பதிவு செய்",
     "loggedToast": "பயிற்சி பதிவு செய்யப்பட்டது!",
     "recentWorkouts": "சமீபத்திய பயிற்சிகள்",
+    "bestTime": "பயிற்சிக்கு சிறந்த நேரம்",
+    "bestTimeHint": "{{time}} பொதுவாக அமைதியான நேரம்.",
+    "quietHours": "அமைதியான நேரங்கள்",
+    "bestTimeNoData": "பரிந்துரைக்கு போதிய தரவு இல்லை.",
     "types": { "CARDIO": "கார்டியோ", "STRENGTH": "வலிமை", "MIXED": "கலப்பு" }
   },
   "analytics": {

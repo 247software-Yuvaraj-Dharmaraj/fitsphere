@@ -75,6 +75,10 @@
     "log": "Log workout",
     "loggedToast": "Workout logged!",
     "recentWorkouts": "Recent workouts",
+    "bestTime": "Best time to train",
+    "bestTimeHint": "{{time}} is usually the quietest.",
+    "quietHours": "quiet hours",
+    "bestTimeNoData": "Not enough data yet for a suggestion.",
     "types": { "CARDIO": "Cardio", "STRENGTH": "Strength", "MIXED": "Mixed" }
   },
   "analytics": {

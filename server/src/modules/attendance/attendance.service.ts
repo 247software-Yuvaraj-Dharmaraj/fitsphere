@@ -129,6 +129,28 @@ export async function getTrend(userId: string, days: number) {
   return { days, series, attendedDays, consistency };
 }
 
+// Suggests the least-busy gym hours, derived from check-in history over the
+// last 30 days (gym-wide). Powers the dashboard "best time to train" hint.
+export async function getBestTime() {
+  const since = new Date();
+  since.setUTCHours(0, 0, 0, 0);
+  since.setUTCDate(since.getUTCDate() - 30);
+
+  const agg = await Attendance.aggregate<{ _id: number; count: number }>([
+    { $match: { checkInAt: { $gte: since } } },
+    { $group: { _id: { $hour: '$checkInAt' }, count: { $sum: 1 } } },
+  ]);
+  const map = new Map(agg.map((a) => [a._id, a.count]));
+
+  const OPEN_FROM = 5;
+  const OPEN_TO = 22;
+  const hours: { hour: number; count: number }[] = [];
+  for (let h = OPEN_FROM; h <= OPEN_TO; h++) hours.push({ hour: h, count: map.get(h) ?? 0 });
+
+  const quietest = [...hours].sort((a, b) => a.count - b.count).slice(0, 3);
+  return { hours, quietest, suggestion: quietest[0]?.hour ?? null };
+}
+
 // Attendance days for a given month (calendar view). month is 1-12.
 export async function getMonth(userId: string, year: number, month: number) {
   const from = new Date(Date.UTC(year, month - 1, 1));

@@ -40,6 +40,17 @@ export async function getTrend(days = 14, signal?: AbortSignal): Promise<Attenda
   return data;
 }
 
+export interface BestTime {
+  hours: { hour: number; count: number }[];
+  quietest: { hour: number; count: number }[];
+  suggestion: number | null;
+}
+
+export async function getBestTime(signal?: AbortSignal): Promise<BestTime> {
+  const { data } = await api.get<BestTime>('/attendance/best-time', { signal });
+  return data;
+}
+
 export async function getSummary(signal?: AbortSignal): Promise<AttendanceSummary> {
   const { data } = await api.get<AttendanceSummary>('/attendance/summary', { signal });
   return data;
