@@ -34,6 +34,9 @@ no CI, client-side grid only, occupancy via polling.
 
 ---
 
+> **Tier 1 status: ✅ COMPLETE** (PRs #8 tests+CI, #9 server-side DataGrid,
+> #10 CRUD shell, and the real-time occupancy PR).
+
 ## Tier 1 — Highest impact (do these)
 
 ### A. Server-side DataGrid (the marquee upgrade)

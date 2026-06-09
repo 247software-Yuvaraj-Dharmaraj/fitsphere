@@ -1,5 +1,6 @@
 import { Attendance, GymConfig } from '../../models/index.js';
 import { HttpError } from '../../middleware/error.js';
+import { emitOccupancy } from '../../lib/realtime.js';
 
 // ---- date helpers (UTC day buckets keep streak math timezone-stable) ----
 function dayKey(d: Date): string {
@@ -47,6 +48,7 @@ export async function checkIn(userId: string) {
   }
 
   const record = await Attendance.create({ user: userId, checkInAt: new Date() });
+  emitOccupancy(await getOccupancy()); // push live update to all clients
   return record;
 }
 
@@ -55,6 +57,7 @@ export async function checkOut(userId: string) {
   if (!open) throw new HttpError(400, 'You are not currently checked in');
   open.checkOutAt = new Date();
   await open.save();
+  emitOccupancy(await getOccupancy()); // push live update to all clients
   return open;
 }
 
