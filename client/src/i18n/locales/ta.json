@@ -25,7 +25,15 @@
     "demoHint": "டெமோ: admin@fitsphere.app / password123"
   },
   "roles": { "MEMBER": "உறுப்பினர்", "TRAINER": "பயிற்சியாளர்", "ADMIN": "நிர்வாகி" },
-  "common": { "loading": "ஏற்றுகிறது...", "comingSoon": "விரைவில்", "language": "மொழி" },
+  "common": {
+    "loading": "ஏற்றுகிறது...",
+    "comingSoon": "விரைவில்",
+    "language": "மொழி",
+    "cancel": "ரத்து",
+    "save": "சேமி",
+    "selected": "தேர்ந்தெடுக்கப்பட்டது",
+    "clear": "அழி"
+  },
   "attendance": {
     "checkIn": "செக்-இன்",
     "checkOut": "செக்-அவுட்",
@@ -57,7 +65,17 @@
     "bookedToast": "நேரம் முன்பதிவு செய்யப்பட்டது!",
     "cancelledToast": "முன்பதிவு ரத்து செய்யப்பட்டது.",
     "createdToast": "நேரம் உருவாக்கப்பட்டது.",
-    "deletedToast": "நேரம் நீக்கப்பட்டது."
+    "updatedToast": "நேரம் புதுப்பிக்கப்பட்டது.",
+    "deletedToast": "நேரம் நீக்கப்பட்டது.",
+    "newSlot": "புதிய நேரம்",
+    "editSlot": "நேரத்தைத் திருத்து",
+    "edit": "நேரத்தைத் திருத்து",
+    "time": "நேரம்",
+    "booked": "முன்பதிவு",
+    "available": "கிடைக்கும்",
+    "deleteConfirmTitle": "நேரத்தை நீக்கவா?",
+    "deleteConfirmSingle": "இது நேரத்தையும் அதன் முன்பதிவுகளையும் நிரந்தரமாக நீக்கும்.",
+    "deleteConfirmMass": "இது {{count}} நேரங்களையும் அவற்றின் முன்பதிவுகளையும் நிரந்தரமாக நீக்கும்."
   },
   "dashboard": {
     "consistency": "நிலைத்தன்மை",

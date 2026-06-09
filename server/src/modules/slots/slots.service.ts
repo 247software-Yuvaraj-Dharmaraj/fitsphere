@@ -1,7 +1,7 @@
 import { Types } from 'mongoose';
 import { Slot } from '../../models/index.js';
 import { HttpError } from '../../middleware/error.js';
-import type { CreateSlotInput } from './slots.schema.js';
+import type { CreateSlotInput, UpdateSlotInput } from './slots.schema.js';
 
 function dayRange(date: string) {
   const [y, m, d] = date.split('-').map(Number);
@@ -85,8 +85,25 @@ export async function create(input: CreateSlotInput) {
   });
 }
 
+export async function update(slotId: string, input: UpdateSlotInput) {
+  if (!Types.ObjectId.isValid(slotId)) throw new HttpError(404, 'Slot not found');
+  const slot = await Slot.findByIdAndUpdate(
+    slotId,
+    { startTime: input.startTime, endTime: input.endTime, capacity: input.capacity },
+    { new: true },
+  );
+  if (!slot) throw new HttpError(404, 'Slot not found');
+  return toDto(slot.toObject() as SlotDoc, '');
+}
+
 export async function remove(slotId: string) {
   if (!Types.ObjectId.isValid(slotId)) throw new HttpError(404, 'Slot not found');
   const deleted = await Slot.findByIdAndDelete(slotId);
   if (!deleted) throw new HttpError(404, 'Slot not found');
+}
+
+export async function bulkRemove(ids: string[]) {
+  const valid = ids.filter((id) => Types.ObjectId.isValid(id));
+  const res = await Slot.deleteMany({ _id: { $in: valid } });
+  return { deleted: res.deletedCount ?? 0 };
 }

@@ -13,6 +13,8 @@ router.delete('/:id/book', asyncHandler(controller.cancel));
 
 // Slot configuration is Admin/Trainer only (mirrors the product roles).
 router.post('/', requireRole('ADMIN', 'TRAINER'), asyncHandler(controller.create));
+router.post('/bulk-delete', requireRole('ADMIN', 'TRAINER'), asyncHandler(controller.bulkRemove));
+router.patch('/:id', requireRole('ADMIN', 'TRAINER'), asyncHandler(controller.update));
 router.delete('/:id', requireRole('ADMIN', 'TRAINER'), asyncHandler(controller.remove));
 
 export default router;

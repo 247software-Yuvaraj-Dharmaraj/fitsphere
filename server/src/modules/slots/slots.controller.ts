@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import * as service from './slots.service.js';
-import { createSlotSchema, dateQuerySchema } from './slots.schema.js';
+import { bulkDeleteSchema, createSlotSchema, dateQuerySchema, updateSlotSchema } from './slots.schema.js';
 
 export async function list(req: Request, res: Response) {
   const { date } = dateQuerySchema.parse(req.query);
@@ -20,7 +20,17 @@ export async function create(req: Request, res: Response) {
   res.status(201).json(await service.create(input));
 }
 
+export async function update(req: Request, res: Response) {
+  const input = updateSlotSchema.parse(req.body);
+  res.json(await service.update(req.params.id, input));
+}
+
 export async function remove(req: Request, res: Response) {
   await service.remove(req.params.id);
   res.status(204).send();
+}
+
+export async function bulkRemove(req: Request, res: Response) {
+  const { ids } = bulkDeleteSchema.parse(req.body);
+  res.json(await service.bulkRemove(ids));
 }

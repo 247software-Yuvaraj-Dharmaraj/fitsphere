@@ -21,4 +21,20 @@ export const createSlotSchema = z
     path: ['endTime'],
   });
 
+export const updateSlotSchema = z
+  .object({
+    startTime: z.string().regex(timeRegex, 'startTime must be HH:MM'),
+    endTime: z.string().regex(timeRegex, 'endTime must be HH:MM'),
+    capacity: z.coerce.number().int().min(1).max(500),
+  })
+  .refine((d) => d.startTime < d.endTime, {
+    message: 'endTime must be after startTime',
+    path: ['endTime'],
+  });
+
+export const bulkDeleteSchema = z.object({
+  ids: z.array(z.string().min(1)).min(1).max(100),
+});
+
 export type CreateSlotInput = z.infer<typeof createSlotSchema>;
+export type UpdateSlotInput = z.infer<typeof updateSlotSchema>;

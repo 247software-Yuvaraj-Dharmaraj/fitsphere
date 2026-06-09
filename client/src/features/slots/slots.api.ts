@@ -40,6 +40,21 @@ export async function createSlot(input: CreateSlotInput): Promise<void> {
   await api.post('/slots', input);
 }
 
+export interface UpdateSlotInput {
+  startTime: string;
+  endTime: string;
+  capacity: number;
+}
+
+export async function updateSlot(id: string, input: UpdateSlotInput): Promise<void> {
+  await api.patch(`/slots/${id}`, input);
+}
+
 export async function deleteSlot(id: string): Promise<void> {
   await api.delete(`/slots/${id}`);
+}
+
+export async function bulkDeleteSlots(ids: string[]): Promise<{ deleted: number }> {
+  const { data } = await api.post<{ deleted: number }>('/slots/bulk-delete', { ids });
+  return data;
 }

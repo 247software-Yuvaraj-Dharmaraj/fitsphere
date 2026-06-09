@@ -25,7 +25,15 @@
     "demoHint": "Demo: admin@fitsphere.app / password123"
   },
   "roles": { "MEMBER": "Member", "TRAINER": "Trainer", "ADMIN": "Admin" },
-  "common": { "loading": "Loading...", "comingSoon": "Coming soon", "language": "Language" },
+  "common": {
+    "loading": "Loading...",
+    "comingSoon": "Coming soon",
+    "language": "Language",
+    "cancel": "Cancel",
+    "save": "Save",
+    "selected": "selected",
+    "clear": "Clear"
+  },
   "attendance": {
     "checkIn": "Check In",
     "checkOut": "Check Out",
@@ -57,7 +65,17 @@
     "bookedToast": "Slot booked!",
     "cancelledToast": "Booking cancelled.",
     "createdToast": "Slot created.",
-    "deletedToast": "Slot deleted."
+    "updatedToast": "Slot updated.",
+    "deletedToast": "Slot deleted.",
+    "newSlot": "New slot",
+    "editSlot": "Edit slot",
+    "edit": "Edit slot",
+    "time": "Time",
+    "booked": "Booked",
+    "available": "Available",
+    "deleteConfirmTitle": "Delete slot(s)?",
+    "deleteConfirmSingle": "This will permanently delete the slot and its bookings.",
+    "deleteConfirmMass": "This will permanently delete {{count}} slot(s) and their bookings."
   },
   "dashboard": {
     "consistency": "Consistency",

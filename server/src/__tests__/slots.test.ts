@@ -47,6 +47,46 @@ describe('slots', () => {
     expect(cancelled.status).toBe(200);
     expect(cancelled.body.bookedByMe).toBe(false);
   });
+
+  it('admin can edit a slot; members cannot', async () => {
+    const admin = await makeUser('ADMIN');
+    await createSlot(admin.token, 5);
+    const list = await request(app).get(`/api/slots?date=${TODAY}`).set(auth(admin.token));
+    const slotId = list.body.slots[0].id;
+
+    const member = await makeUser('MEMBER');
+    const denied = await request(app)
+      .patch(`/api/slots/${slotId}`)
+      .set(auth(member.token))
+      .send({ startTime: '08:00', endTime: '09:00', capacity: 10 });
+    expect(denied.status).toBe(403);
+
+    const edited = await request(app)
+      .patch(`/api/slots/${slotId}`)
+      .set(auth(admin.token))
+      .send({ startTime: '08:00', endTime: '09:00', capacity: 10 });
+    expect(edited.status).toBe(200);
+    expect(edited.body.startTime).toBe('08:00');
+    expect(edited.body.capacity).toBe(10);
+  });
+
+  it('admin can bulk-delete slots', async () => {
+    const admin = await makeUser('ADMIN');
+    await createSlot(admin.token);
+    await createSlot(admin.token);
+    const list = await request(app).get(`/api/slots?date=${TODAY}`).set(auth(admin.token));
+    const ids = list.body.slots.map((s: { id: string }) => s.id);
+
+    const res = await request(app)
+      .post('/api/slots/bulk-delete')
+      .set(auth(admin.token))
+      .send({ ids });
+    expect(res.status).toBe(200);
+    expect(res.body.deleted).toBe(ids.length);
+
+    const after = await request(app).get(`/api/slots?date=${TODAY}`).set(auth(admin.token));
+    expect(after.body.slots).toHaveLength(0);
+  });
 });
 
 describe('analytics', () => {
