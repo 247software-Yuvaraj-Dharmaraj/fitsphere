@@ -78,10 +78,27 @@ export function useCreateSlot(date: string) {
   });
 }
 
+export function useUpdateSlot(date: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, input }: { id: string; input: api.UpdateSlotInput }) =>
+      api.updateSlot(id, input),
+    onSuccess: () => qc.invalidateQueries({ queryKey: slotsKeys.byDate(date) }),
+  });
+}
+
 export function useDeleteSlot(date: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (slotId: string) => api.deleteSlot(slotId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: slotsKeys.byDate(date) }),
+  });
+}
+
+export function useBulkDeleteSlots(date: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (ids: string[]) => api.bulkDeleteSlots(ids),
     onSuccess: () => qc.invalidateQueries({ queryKey: slotsKeys.byDate(date) }),
   });
 }

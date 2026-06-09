@@ -6,6 +6,7 @@ import {
   useReactTable,
   type ColumnDef,
   type OnChangeFn,
+  type RowSelectionState,
   type SortingState,
 } from '@tanstack/react-table';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -29,6 +30,10 @@ interface DataGridProps<T> {
   onSortingChange?: OnChangeFn<SortingState>;
   pagination?: ServerPagination;
   loading?: boolean;
+  // Row selection (controlled): provide all three to enable checkboxes.
+  getRowId?: (row: T) => string;
+  rowSelection?: RowSelectionState;
+  onRowSelectionChange?: OnChangeFn<RowSelectionState>;
 }
 
 /** Sortable, density-aware data grid (TanStack Table). Supports client-side
@@ -42,16 +47,23 @@ export function DataGrid<T>({
   onSortingChange,
   pagination,
   loading,
+  getRowId,
+  rowSelection,
+  onRowSelectionChange,
 }: DataGridProps<T>) {
   const { density } = useDensity();
   const [internalSorting, setInternalSorting] = useState<SortingState>([]);
   const manual = sorting !== undefined && onSortingChange !== undefined;
+  const selectable = Boolean(getRowId && rowSelection && onRowSelectionChange);
 
   const table = useReactTable({
     data,
     columns,
-    state: { sorting: manual ? sorting : internalSorting },
+    state: { sorting: manual ? sorting : internalSorting, rowSelection: rowSelection ?? {} },
     onSortingChange: manual ? onSortingChange : setInternalSorting,
+    onRowSelectionChange,
+    enableRowSelection: selectable,
+    getRowId,
     manualSorting: manual,
     getCoreRowModel: getCoreRowModel(),
     ...(manual ? {} : { getSortedRowModel: getSortedRowModel() }),
@@ -59,6 +71,7 @@ export function DataGrid<T>({
 
   const cellPad = density === 'compact' ? 'px-3 py-1.5' : 'px-4 py-3';
   const rows = table.getRowModel().rows;
+  const colCount = columns.length + (selectable ? 1 : 0);
 
   const totalPages = pagination ? Math.max(1, Math.ceil(pagination.total / pagination.pageSize)) : 1;
 
@@ -69,6 +82,19 @@ export function DataGrid<T>({
           <thead className="border-b border-slate-200 bg-slate-50 text-xs tracking-wide text-slate-500 uppercase dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-400">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
+                {selectable && (
+                  <th scope="col" className={`${cellPad} w-10`}>
+                    <input
+                      type="checkbox"
+                      aria-label="Select all"
+                      checked={table.getIsAllRowsSelected()}
+                      ref={(el) => {
+                        if (el) el.indeterminate = table.getIsSomeRowsSelected();
+                      }}
+                      onChange={table.getToggleAllRowsSelectedHandler()}
+                    />
+                  </th>
+                )}
                 {headerGroup.headers.map((header) => {
                   const sorted = header.column.getIsSorted();
                   const canSort = header.column.getCanSort();
@@ -109,7 +135,7 @@ export function DataGrid<T>({
             {rows.length === 0 ? (
               <tr>
                 <td
-                  colSpan={columns.length}
+                  colSpan={colCount}
                   className="px-4 py-10 text-center text-slate-400 dark:text-slate-500"
                 >
                   {emptyText ?? 'No data'}
@@ -117,7 +143,22 @@ export function DataGrid<T>({
               </tr>
             ) : (
               rows.map((row) => (
-                <tr key={row.id} className="transition hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                <tr
+                  key={row.id}
+                  className={`transition hover:bg-slate-50 dark:hover:bg-slate-800/50 ${
+                    row.getIsSelected() ? 'bg-brand-50/60 dark:bg-brand-500/10' : ''
+                  }`}
+                >
+                  {selectable && (
+                    <td className={cellPad}>
+                      <input
+                        type="checkbox"
+                        aria-label="Select row"
+                        checked={row.getIsSelected()}
+                        onChange={row.getToggleSelectedHandler()}
+                      />
+                    </td>
+                  )}
                   {row.getVisibleCells().map((cell) => (
                     <td key={cell.id} className={cellPad}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
