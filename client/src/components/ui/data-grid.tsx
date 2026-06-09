@@ -87,6 +87,7 @@ export function DataGrid<T>({
                   <th scope="col" className={`${cellPad} w-10`}>
                     <input
                       type="checkbox"
+                      className="fs-checkbox"
                       aria-label="Select all"
                       checked={table.getIsAllRowsSelected()}
                       ref={(el) => {
@@ -154,6 +155,7 @@ export function DataGrid<T>({
                     <td className={cellPad}>
                       <input
                         type="checkbox"
+                        className="fs-checkbox"
                         aria-label="Select row"
                         checked={row.getIsSelected()}
                         onChange={row.getToggleSelectedHandler()}
