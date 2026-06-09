@@ -42,7 +42,7 @@ export function ConfirmDialog({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+      className="fs-overlay fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
       onClick={onCancel}
     >
       <div
@@ -52,7 +52,7 @@ export function ConfirmDialog({
         aria-labelledby={titleId}
         aria-describedby={msgId}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-lg dark:border-slate-800 dark:bg-slate-900"
+        className="fs-dialog w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-lg dark:border-slate-800 dark:bg-slate-900"
       >
         <h2 id={titleId} className="text-lg font-semibold text-slate-900 dark:text-slate-100">
           {title}
@@ -64,12 +64,8 @@ export function ConfirmDialog({
           <Button variant="secondary" onClick={onCancel} disabled={loading}>
             {t('common.cancel')}
           </Button>
-          <Button
-            variant={destructive ? 'danger' : 'primary'}
-            onClick={onConfirm}
-            disabled={loading}
-          >
-            {loading ? t('common.loading') : confirmLabel}
+          <Button variant={destructive ? 'danger' : 'primary'} onClick={onConfirm} loading={loading}>
+            {confirmLabel}
           </Button>
         </div>
       </div>

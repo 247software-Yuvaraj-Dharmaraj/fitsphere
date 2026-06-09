@@ -85,7 +85,7 @@ export function SignupPage() {
           onChange={(e) => update('role', e.target.value as Role)}
           options={ROLES.map((r) => ({ value: r, label: t(`roles.${r}`) }))}
         />
-        <Button type="submit" disabled={submitting} className="w-full">
+        <Button type="submit" loading={submitting} className="w-full">
           {submitting ? t('auth.creatingAccount') : t('auth.signUp')}
         </Button>
       </form>

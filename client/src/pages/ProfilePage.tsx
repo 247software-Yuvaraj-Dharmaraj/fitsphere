@@ -109,7 +109,7 @@ function StaffFeedback() {
         disabled={!memberId}
         className={`${fieldClasses} disabled:bg-slate-50 dark:disabled:bg-slate-800/50`}
       />
-      <Button onClick={submit} disabled={!memberId || !note.trim() || create.isPending}>
+      <Button onClick={submit} disabled={!memberId || !note.trim()} loading={create.isPending}>
         {t('profile.submit')}
       </Button>
 

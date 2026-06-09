@@ -52,7 +52,7 @@ export function LoginPage() {
           onChange={(e) => setPassword(e.target.value)}
           autoComplete="current-password"
         />
-        <Button type="submit" disabled={submitting} className="w-full">
+        <Button type="submit" loading={submitting} className="w-full">
           {submitting ? t('auth.signingIn') : t('auth.signIn')}
         </Button>
       </form>

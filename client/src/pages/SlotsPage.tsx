@@ -286,7 +286,7 @@ function AdminSlots({ date }: { date: string }) {
             <Button variant="secondary" onClick={() => setDrawer(null)}>
               {t('common.cancel')}
             </Button>
-            <Button type="submit" form="slot-form" disabled={saving}>
+            <Button type="submit" form="slot-form" loading={saving}>
               {t('common.save')}
             </Button>
           </>

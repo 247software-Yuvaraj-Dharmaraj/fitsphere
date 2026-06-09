@@ -228,7 +228,7 @@ function LogWorkoutForm() {
         />
         <span className="text-sm text-slate-400 dark:text-slate-500">{t('dashboard.minutes')}</span>
       </div>
-      <Button onClick={submit} disabled={logWorkout.isPending} className="w-full">
+      <Button onClick={submit} loading={logWorkout.isPending} className="w-full">
         {t('dashboard.log')}
       </Button>
     </div>
