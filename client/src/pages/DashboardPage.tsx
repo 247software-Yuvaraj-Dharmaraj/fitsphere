@@ -28,6 +28,7 @@ import { getApiErrorMessage } from '../lib/api';
 import { PageHeader } from '../components/ui/page-header';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
+import { Empty } from '../components/ui/empty';
 import { fieldClasses } from '../components/ui/field';
 
 const WORKOUT_TYPES: WorkoutType[] = ['CARDIO', 'STRENGTH', 'MIXED'];
@@ -272,9 +273,5 @@ function StatCard({
 }
 
 function EmptyHint({ text }: { text: string }) {
-  return (
-    <div className="flex h-[180px] items-center justify-center text-sm text-slate-400 dark:text-slate-500">
-      {text}
-    </div>
-  );
+  return <Empty text={text} className="h-[180px]" />;
 }
