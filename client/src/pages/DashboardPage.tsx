@@ -47,9 +47,12 @@ export function DashboardPage() {
   const recent = useRecentWorkouts(5);
   const bestTime = useBestTime();
 
+  // 24-hour, locale-neutral (avoids Latin "AM/PM" leaking into non-English UIs).
   const formatHour = (h: number) =>
     new Intl.DateTimeFormat(i18n.resolvedLanguage ?? 'en', {
-      hour: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
       timeZone: 'UTC',
     }).format(new Date(Date.UTC(2024, 0, 1, h)));
 
