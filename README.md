@@ -43,6 +43,29 @@ data-driven dashboards.
 |---|---|
 | ![Attendance](screenshots/attendance.png) | ![Slots](screenshots/slots.png) |
 
+## Engineering Highlights
+
+**Architecture & data**
+- Full-stack **TypeScript** monorepo (React + Vite client, Express API), deployed across **Vercel + Render + MongoDB Atlas**.
+- Per-feature backend modules with a **controller → service → model** split and **Zod** validation at the request boundary.
+- **Server-side data grid** — the member directory is paginated, sorted, and searched entirely in MongoDB via a single **aggregation pipeline** (`$lookup` → visit stats, `$switch` → engagement status, `$facet` → page rows + total count).
+
+**Auth & security**
+- Self-built **JWT auth** (access + refresh) with **refresh-token rotation** (unique `jti`) and a revocable token store.
+- **Role-based access control** (Member / Trainer / Admin) enforced in **API middleware *and*** the client router.
+
+**Real-time & data fetching**
+- **Live gym occupancy over Socket.IO** — pushed on every check-in/out, with an automatic **polling fallback** if the socket drops.
+- **TanStack Query** throughout: **optimistic** check-in/out (rollback on error), cache patched from socket events, **debounced search** with **AbortController** request cancellation.
+
+**Frontend craft**
+- Reusable design-system layer (Button, Card, Select, DataGrid, Drawer, ConfirmDialog, …) with **dark mode + density** toggles and preferences **persisted to the user account**.
+- **i18n** (English + Tamil), **route-level code-splitting** (chart-heavy pages lazy-loaded), and an **accessibility pass** (focus traps, ARIA labelling, skip link, keyboard nav).
+
+**Quality & delivery**
+- **Vitest** suites — server integration tests against an **in-memory MongoDB** (supertest) + client component/hook tests (React Testing Library).
+- **GitHub Actions CI** (lint → build → test) on every PR; clean PR-based `development → main` workflow.
+
 ## Tech Stack
 
 | Layer    | Technology |
