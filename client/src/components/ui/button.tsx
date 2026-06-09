@@ -27,13 +27,14 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   size?: Size;
 }
 
-export function buttonClasses(variant: Variant = 'primary', size: Size = 'md', className = ''): string {
-  return `${base} ${variants[variant]} ${sizes[size]} ${className}`.trim();
-}
-
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ variant = 'primary', size = 'md', className, type = 'button', ...props }, ref) => (
-    <button ref={ref} type={type} className={buttonClasses(variant, size, className)} {...props} />
+  ({ variant = 'primary', size = 'md', className = '', type = 'button', ...props }, ref) => (
+    <button
+      ref={ref}
+      type={type}
+      className={`${base} ${variants[variant]} ${sizes[size]} ${className}`.trim()}
+      {...props}
+    />
   ),
 );
 

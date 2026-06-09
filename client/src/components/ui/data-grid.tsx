@@ -56,6 +56,7 @@ export function DataGrid<T>({
   const manual = sorting !== undefined && onSortingChange !== undefined;
   const selectable = Boolean(getRowId && rowSelection && onRowSelectionChange);
 
+  // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table manages its own memoization
   const table = useReactTable({
     data,
     columns,
