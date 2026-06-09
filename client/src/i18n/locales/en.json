@@ -1,5 +1,8 @@
 {
-  "app": { "name": "FitSphere", "tagline": "Train smarter. Beat the crowd." },
+  "app": {
+    "name": "FitSphere",
+    "tagline": "Train smarter. Beat the crowd."
+  },
   "nav": {
     "dashboard": "Dashboard",
     "attendance": "Attendance",
@@ -24,7 +27,11 @@
     "createAccount": "Create your account",
     "demoHint": "Demo: admin@fitsphere.app / password123"
   },
-  "roles": { "MEMBER": "Member", "TRAINER": "Trainer", "ADMIN": "Admin" },
+  "roles": {
+    "MEMBER": "Member",
+    "TRAINER": "Trainer",
+    "ADMIN": "Admin"
+  },
   "common": {
     "loading": "Loading...",
     "comingSoon": "Coming soon",
@@ -42,7 +49,8 @@
     "darkMode": "Dark mode",
     "lightMode": "Light mode",
     "compact": "Compact",
-    "comfortable": "Comfortable"
+    "comfortable": "Comfortable",
+    "selectAll": "Select all"
   },
   "attendance": {
     "checkIn": "Check In",
@@ -59,7 +67,12 @@
     "thisMonth": "This month",
     "allTime": "All time",
     "dayStreak": "{{count}}-day streak",
-    "levels": { "LOW": "Low", "MEDIUM": "Medium", "HIGH": "High", "FULL": "Full" }
+    "levels": {
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High",
+      "FULL": "Full"
+    }
   },
   "slots": {
     "book": "Book",
@@ -107,7 +120,11 @@
     "bestTimeHint": "{{time}} is usually the quietest.",
     "quietHours": "quiet hours",
     "bestTimeNoData": "Not enough data yet for a suggestion.",
-    "types": { "CARDIO": "Cardio", "STRENGTH": "Strength", "MIXED": "Mixed" }
+    "types": {
+      "CARDIO": "Cardio",
+      "STRENGTH": "Strength",
+      "MIXED": "Mixed"
+    }
   },
   "analytics": {
     "totalMembers": "Members",
@@ -129,7 +146,11 @@
     "status": "Status",
     "never": "Never",
     "noMembers": "No members found.",
-    "statuses": { "ACTIVE": "Active", "AT_RISK": "At risk", "INACTIVE": "Inactive" }
+    "statuses": {
+      "ACTIVE": "Active",
+      "AT_RISK": "At risk",
+      "INACTIVE": "Inactive"
+    }
   },
   "profile": {
     "feedbackFromTrainers": "Feedback from your trainers",
@@ -142,10 +163,25 @@
     "memberFeedback": "Feedback history"
   },
   "pages": {
-    "dashboard": { "title": "Dashboard", "subtitle": "Your attendance and consistency at a glance." },
-    "attendance": { "title": "Attendance", "subtitle": "Check in, track streaks, view your calendar." },
-    "slots": { "title": "Workout Slots", "subtitle": "Book a slot and beat peak hours." },
-    "analytics": { "title": "Analytics", "subtitle": "Gym usage, peak hours, and engagement." },
-    "profile": { "title": "Profile", "subtitle": "Manage your account." }
+    "dashboard": {
+      "title": "Dashboard",
+      "subtitle": "Your attendance and consistency at a glance."
+    },
+    "attendance": {
+      "title": "Attendance",
+      "subtitle": "Check in, track streaks, view your calendar."
+    },
+    "slots": {
+      "title": "Workout Slots",
+      "subtitle": "Book a slot and beat peak hours."
+    },
+    "analytics": {
+      "title": "Analytics",
+      "subtitle": "Gym usage, peak hours, and engagement."
+    },
+    "profile": {
+      "title": "Profile",
+      "subtitle": "Manage your account."
+    }
   }
 }

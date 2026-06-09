@@ -268,7 +268,11 @@ function AdminSlots({ date }: { date: string }) {
         </Button>
       </div>
 
-      <SelectionBar count={selectedIds.length} onClear={() => setRowSelection({})}>
+      <SelectionBar
+        count={selectedIds.length}
+        onClear={() => setRowSelection({})}
+        onSelectAll={() => setRowSelection(Object.fromEntries(slots.map((s) => [s.id, true])))}
+      >
         <Button variant="danger" size="sm" onClick={() => setConfirm({ kind: 'mass' })}>
           <Trash2 size={14} />
           {t('slots.delete')}
