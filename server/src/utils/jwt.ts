@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import jwt, { type SignOptions } from 'jsonwebtoken';
 import { env } from '../config/env.js';
 import type { Role } from '../models/index.js';
@@ -14,7 +15,9 @@ export function signAccessToken(payload: AccessPayload): string {
 }
 
 export function signRefreshToken(payload: AccessPayload): string {
-  return jwt.sign(payload, env.jwt.refreshSecret, {
+  // jti guarantees each refresh token is unique even when issued in the same
+  // second, so rotation always produces a distinct token.
+  return jwt.sign({ ...payload, jti: randomUUID() }, env.jwt.refreshSecret, {
     expiresIn: env.jwt.refreshTtl,
   } as SignOptions);
 }

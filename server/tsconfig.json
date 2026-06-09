@@ -15,5 +15,6 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true
   },
-  "include": ["src/**/*.ts", "prisma/**/*.ts"]
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/**/__tests__/**", "vitest.config.ts"]
 }
