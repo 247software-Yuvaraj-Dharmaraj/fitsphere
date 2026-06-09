@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
+import { User, Mail, Phone, Lock, UserPlus } from 'lucide-react';
 import { useAuth } from '../features/auth/useAuth';
 import { getApiErrorMessage } from '../lib/api';
 import type { Role } from '../features/auth/auth.types';
@@ -53,12 +54,14 @@ export function SignupPage() {
       <form onSubmit={handleSubmit} className="space-y-4">
         <TextField
           label={t('auth.name')}
+          icon={<User size={16} />}
           required
           value={form.name}
           onChange={(e) => update('name', e.target.value)}
         />
         <TextField
           label={t('auth.email')}
+          icon={<Mail size={16} />}
           type="email"
           required
           value={form.email}
@@ -67,11 +70,13 @@ export function SignupPage() {
         />
         <TextField
           label={t('auth.mobile')}
+          icon={<Phone size={16} />}
           value={form.mobile}
           onChange={(e) => update('mobile', e.target.value)}
         />
         <TextField
           label={t('auth.password')}
+          icon={<Lock size={16} />}
           type="password"
           required
           minLength={6}
@@ -86,6 +91,7 @@ export function SignupPage() {
           options={ROLES.map((r) => ({ value: r, label: t(`roles.${r}`) }))}
         />
         <Button type="submit" loading={submitting} className="w-full">
+          {!submitting && <UserPlus size={16} />}
           {submitting ? t('auth.creatingAccount') : t('auth.signUp')}
         </Button>
       </form>

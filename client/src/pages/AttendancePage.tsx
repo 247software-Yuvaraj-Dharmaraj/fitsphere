@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { Flame, LogIn, LogOut, Users } from 'lucide-react';
+import { Flame, LogIn, LogOut, Users, CalendarCheck } from 'lucide-react';
 import {
   useAttendanceSummary,
   useCheckIn,
@@ -70,7 +70,11 @@ export function AttendancePage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <PageHeader title={t('pages.attendance.title')} subtitle={t('pages.attendance.subtitle')} />
+      <PageHeader
+        icon={<CalendarCheck size={24} />}
+        title={t('pages.attendance.title')}
+        subtitle={t('pages.attendance.subtitle')}
+      />
 
       {/* Today / check-in card */}
       <Card className="p-6">

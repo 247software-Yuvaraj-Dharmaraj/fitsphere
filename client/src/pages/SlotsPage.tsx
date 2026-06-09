@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import type { ColumnDef, RowSelectionState } from '@tanstack/react-table';
-import { ChevronLeft, ChevronRight, Pencil, Plus, Trash2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Pencil, Plus, Trash2, CalendarClock } from 'lucide-react';
 import {
   useBookSlot,
   useBulkDeleteSlots,
@@ -48,7 +48,11 @@ export function SlotsPage() {
 
   return (
     <div className="mx-auto max-w-3xl">
-      <PageHeader title={t('pages.slots.title')} subtitle={t('pages.slots.subtitle')} />
+      <PageHeader
+        icon={<CalendarClock size={24} />}
+        title={t('pages.slots.title')}
+        subtitle={t('pages.slots.subtitle')}
+      />
 
       <Card className="mb-6 flex items-center justify-between px-4 py-3">
         <button
