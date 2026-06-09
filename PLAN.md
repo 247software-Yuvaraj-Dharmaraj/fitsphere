@@ -114,6 +114,7 @@ document-model decision worth being able to explain.
 - [x] Member dashboard (Recharts) — trend + workout-mix charts, stat cards, quick log; route code-splitting
 - [x] Admin analytics — peak hours, daily trend, member directory w/ engagement status + debounced search
 - [x] Trainer feedback timeline (+ Profile page as the hub: member timeline / staff give-feedback)
+- [x] UI design system (mirrors incidentdesk): components/ui primitives, AG-style DataGrid (TanStack Table), dark mode + density toggles, all pages refactored
 - [ ] Second locale, loading/error/empty states, skeletons
 - [ ] README with screenshots + architecture diagram
 - [ ] Final deploy (frontend: Vercel/Netlify, backend: Render/Railway, DB: MongoDB Atlas)

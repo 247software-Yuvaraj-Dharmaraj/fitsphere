@@ -1,10 +1,12 @@
-import { useState, type FormEvent } from 'react';
+import { useState, type FormEvent, type ReactNode } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Dumbbell } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '../features/auth/useAuth';
 import { getApiErrorMessage } from '../lib/api';
+import { TextField } from '../components/ui/text-field';
+import { Button } from '../components/ui/button';
 
 export function LoginPage() {
   const { t } = useTranslation();
@@ -15,7 +17,8 @@ export function LoginPage() {
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  const from = (location.state as { from?: { pathname: string } } | null)?.from?.pathname ?? '/dashboard';
+  const from =
+    (location.state as { from?: { pathname: string } } | null)?.from?.pathname ?? '/dashboard';
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -33,67 +36,50 @@ export function LoginPage() {
   return (
     <AuthShell title={t('auth.welcomeBack')}>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <Field label={t('auth.email')}>
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className={inputClass}
-            autoComplete="email"
-          />
-        </Field>
-        <Field label={t('auth.password')}>
-          <input
-            type="password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className={inputClass}
-            autoComplete="current-password"
-          />
-        </Field>
-        <button type="submit" disabled={submitting} className={buttonClass}>
+        <TextField
+          label={t('auth.email')}
+          type="email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          autoComplete="email"
+        />
+        <TextField
+          label={t('auth.password')}
+          type="password"
+          required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          autoComplete="current-password"
+        />
+        <Button type="submit" disabled={submitting} className="w-full">
           {submitting ? t('auth.signingIn') : t('auth.signIn')}
-        </button>
+        </Button>
       </form>
-      <p className="mt-4 text-center text-sm text-slate-500">
+      <p className="mt-4 text-center text-sm text-slate-500 dark:text-slate-400">
         {t('auth.noAccount')}{' '}
-        <Link to="/signup" className="font-medium text-brand-600 hover:underline">
+        <Link to="/signup" className="font-medium text-brand-600 hover:underline dark:text-brand-400">
           {t('auth.signUp')}
         </Link>
       </p>
-      <p className="mt-2 text-center text-xs text-slate-400">{t('auth.demoHint')}</p>
+      <p className="mt-2 text-center text-xs text-slate-400 dark:text-slate-500">
+        {t('auth.demoHint')}
+      </p>
     </AuthShell>
   );
 }
 
-// ---- shared bits (also used by SignupPage) ----
-export const inputClass =
-  'w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500';
-export const buttonClass =
-  'w-full rounded-md bg-brand-600 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-60';
-
-export function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <label className="block">
-      <span className="mb-1 block text-sm font-medium text-slate-700">{label}</span>
-      {children}
-    </label>
-  );
-}
-
-export function AuthShell({ title, children }: { title: string; children: React.ReactNode }) {
+export function AuthShell({ title, children }: { title: string; children: ReactNode }) {
   const { t } = useTranslation();
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-brand-50 to-slate-100 p-4">
-      <div className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-sm">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-brand-50 to-slate-100 p-4 dark:from-slate-900 dark:to-slate-950">
+      <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <div className="mb-6 text-center">
-          <div className="mb-2 flex items-center justify-center gap-2 text-brand-700">
+          <div className="mb-2 flex items-center justify-center gap-2 text-brand-700 dark:text-brand-500">
             <Dumbbell size={26} />
             <span className="text-xl font-bold">{t('app.name')}</span>
           </div>
-          <h1 className="text-lg font-semibold text-slate-800">{title}</h1>
+          <h1 className="text-lg font-semibold text-slate-800 dark:text-slate-100">{title}</h1>
         </div>
         {children}
       </div>
