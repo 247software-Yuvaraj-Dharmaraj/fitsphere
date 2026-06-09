@@ -16,6 +16,8 @@ function toPublicUser(user: IUser) {
     email: user.email,
     mobile: user.mobile,
     role: user.role,
+    // Fallback for accounts created before preferences existed.
+    preferences: user.preferences ?? { theme: 'light', density: 'comfortable', locale: 'en' },
   };
 }
 
@@ -93,5 +95,18 @@ export async function logout(token: string) {
 export async function getMe(userId: string) {
   const user = await User.findById(userId);
   if (!user) throw new HttpError(404, 'User not found');
+  return toPublicUser(user);
+}
+
+export async function updatePreferences(
+  userId: string,
+  prefs: Partial<{ theme: 'light' | 'dark'; density: 'comfortable' | 'compact'; locale: string }>,
+) {
+  const user = await User.findById(userId);
+  if (!user) throw new HttpError(404, 'User not found');
+  if (prefs.theme) user.preferences.theme = prefs.theme;
+  if (prefs.density) user.preferences.density = prefs.density;
+  if (prefs.locale) user.preferences.locale = prefs.locale;
+  await user.save();
   return toPublicUser(user);
 }

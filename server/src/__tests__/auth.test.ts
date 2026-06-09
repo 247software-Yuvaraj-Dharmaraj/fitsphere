@@ -57,6 +57,23 @@ describe('auth', () => {
     expect(me.body.role).toBe('ADMIN');
   });
 
+  it('defaults preferences and persists updates', async () => {
+    const user = await makeUser('MEMBER');
+    const me = await request(app).get('/api/auth/me').set(auth(user.token));
+    expect(me.body.preferences).toEqual({ theme: 'light', density: 'comfortable', locale: 'en' });
+
+    const upd = await request(app)
+      .patch('/api/auth/me/preferences')
+      .set(auth(user.token))
+      .send({ theme: 'dark', locale: 'ta' });
+    expect(upd.status).toBe(200);
+    expect(upd.body.preferences).toMatchObject({ theme: 'dark', density: 'comfortable', locale: 'ta' });
+
+    // persisted across a fresh read
+    const me2 = await request(app).get('/api/auth/me').set(auth(user.token));
+    expect(me2.body.preferences.theme).toBe('dark');
+  });
+
   it('refreshes tokens and rotates the refresh token', async () => {
     const user = await makeUser('MEMBER');
     const res = await request(app)

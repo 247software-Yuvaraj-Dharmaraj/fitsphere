@@ -8,6 +8,12 @@ export const WORKOUT_TYPES = ['CARDIO', 'STRENGTH', 'MIXED'] as const;
 export type WorkoutType = (typeof WORKOUT_TYPES)[number];
 
 // ---- User ----
+export interface IUserPreferences {
+  theme: 'light' | 'dark';
+  density: 'comfortable' | 'compact';
+  locale: string;
+}
+
 export interface IUser {
   _id: Types.ObjectId;
   name: string;
@@ -15,6 +21,7 @@ export interface IUser {
   mobile?: string;
   passwordHash: string;
   role: Role;
+  preferences: IUserPreferences;
   createdAt: Date;
 }
 
@@ -25,6 +32,11 @@ const userSchema = new Schema<IUser>(
     mobile: { type: String, unique: true, sparse: true, trim: true },
     passwordHash: { type: String, required: true },
     role: { type: String, enum: ROLES, default: 'MEMBER' },
+    preferences: {
+      theme: { type: String, enum: ['light', 'dark'], default: 'light' },
+      density: { type: String, enum: ['comfortable', 'compact'], default: 'comfortable' },
+      locale: { type: String, default: 'en' },
+    },
   },
   { timestamps: { createdAt: true, updatedAt: false } },
 );

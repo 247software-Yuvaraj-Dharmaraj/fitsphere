@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import * as authService from './auth.service.js';
-import { refreshSchema, signinSchema, signupSchema } from './auth.schema.js';
+import { preferencesSchema, refreshSchema, signinSchema, signupSchema } from './auth.schema.js';
 
 export async function signup(req: Request, res: Response) {
   const input = signupSchema.parse(req.body);
@@ -28,5 +28,11 @@ export async function logout(req: Request, res: Response) {
 
 export async function me(req: Request, res: Response) {
   const result = await authService.getMe(req.user!.id);
+  res.json(result);
+}
+
+export async function updatePreferences(req: Request, res: Response) {
+  const prefs = preferencesSchema.parse(req.body);
+  const result = await authService.updatePreferences(req.user!.id, prefs);
   res.json(result);
 }

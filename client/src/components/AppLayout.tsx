@@ -13,6 +13,7 @@ import type { ComponentType } from 'react';
 import { useAuth } from '../features/auth/useAuth';
 import type { Role } from '../features/auth/auth.types';
 import { useRealtimeOccupancy } from '../lib/useRealtimeOccupancy';
+import { usePreferenceSync } from '../lib/usePreferenceSync';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { ThemeToggle } from './theme-toggle';
 import { DensityToggle } from './density-toggle';
@@ -37,6 +38,7 @@ export function AppLayout() {
   const { user, signout } = useAuth();
   const navigate = useNavigate();
   useRealtimeOccupancy(); // live occupancy pushes while signed in
+  usePreferenceSync(); // theme/density/locale follow the account
 
   const items = NAV_ITEMS.filter((i) => !i.roles || (user && i.roles.includes(user.role)));
 

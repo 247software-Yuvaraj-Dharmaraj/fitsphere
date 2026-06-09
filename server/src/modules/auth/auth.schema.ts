@@ -19,6 +19,16 @@ export const refreshSchema = z.object({
   refreshToken: z.string().min(1, 'Refresh token is required'),
 });
 
+export const preferencesSchema = z
+  .object({
+    theme: z.enum(['light', 'dark']).optional(),
+    density: z.enum(['comfortable', 'compact']).optional(),
+    locale: z.string().min(2).max(5).optional(),
+  })
+  .refine((d) => d.theme || d.density || d.locale, {
+    message: 'At least one preference is required',
+  });
+
 export type SignupInput = z.infer<typeof signupSchema>;
 export type SigninInput = z.infer<typeof signinSchema>;
 export type RefreshInput = z.infer<typeof refreshSchema>;
