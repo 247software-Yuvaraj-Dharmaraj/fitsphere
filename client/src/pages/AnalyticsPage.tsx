@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ColumnDef, OnChangeFn, SortingState } from '@tanstack/react-table';
 import {
@@ -41,8 +41,11 @@ export function AnalyticsPage() {
   const [page, setPage] = useState(0);
   const debounced = useDebounce(search, 300);
 
-  // Reset to the first page whenever the search term changes.
-  useEffect(() => setPage(0), [debounced]);
+  // Typing in the search box resets to the first page (no effect needed).
+  function onSearchChange(value: string) {
+    setSearch(value);
+    setPage(0);
+  }
 
   const sortState = sorting[0] ?? { id: 'totalVisits', desc: true };
   const members = useMembers({
@@ -194,7 +197,7 @@ export function AnalyticsPage() {
               <input
                 type="search"
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => onSearchChange(e.target.value)}
                 placeholder={t('analytics.searchPlaceholder')}
                 aria-label={t('analytics.searchPlaceholder')}
                 className={`${fieldClasses} pl-8`}
