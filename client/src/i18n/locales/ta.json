@@ -38,7 +38,11 @@
     "reload": "மீண்டும் ஏற்று",
     "skipToContent": "உள்ளடக்கத்திற்கு செல்",
     "previous": "முந்தைய",
-    "next": "அடுத்து"
+    "next": "அடுத்து",
+    "darkMode": "இருண்ட பயன்முறை",
+    "lightMode": "ஒளி பயன்முறை",
+    "compact": "சுருக்கம்",
+    "comfortable": "வசதியான"
   },
   "attendance": {
     "checkIn": "செக்-இன்",

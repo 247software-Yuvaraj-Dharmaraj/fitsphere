@@ -22,6 +22,7 @@ import { DataGrid } from '../components/ui/data-grid';
 import { Drawer } from '../components/ui/drawer';
 import { ConfirmDialog } from '../components/ui/confirm-dialog';
 import { SelectionBar } from '../components/ui/selection-bar';
+import { Tooltip } from '../components/ui/tooltip';
 import { fieldClasses, labelClasses } from '../components/ui/field';
 
 function todayKey() {
@@ -176,22 +177,24 @@ function AdminSlots({ date }: { date: string }) {
         enableSorting: false,
         cell: ({ row }) => (
           <div className="flex justify-end gap-1">
-            <button
-              onClick={() => setDrawer({ mode: 'edit', slot: row.original })}
-              className="rounded-md p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 focus-visible:ring-2 focus-visible:ring-brand-300 focus-visible:outline-none dark:hover:bg-slate-800"
-              aria-label={t('slots.edit')}
-              title={t('slots.edit')}
-            >
-              <Pencil size={15} />
-            </button>
-            <button
-              onClick={() => setConfirm({ kind: 'single', slot: row.original })}
-              className="rounded-md p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600 focus-visible:ring-2 focus-visible:ring-red-300 focus-visible:outline-none dark:hover:bg-red-950"
-              aria-label={t('slots.delete')}
-              title={t('slots.delete')}
-            >
-              <Trash2 size={15} />
-            </button>
+            <Tooltip label={t('slots.edit')}>
+              <button
+                onClick={() => setDrawer({ mode: 'edit', slot: row.original })}
+                className="rounded-md p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 focus-visible:ring-2 focus-visible:ring-brand-300 focus-visible:outline-none dark:hover:bg-slate-800"
+                aria-label={t('slots.edit')}
+              >
+                <Pencil size={15} />
+              </button>
+            </Tooltip>
+            <Tooltip label={t('slots.delete')}>
+              <button
+                onClick={() => setConfirm({ kind: 'single', slot: row.original })}
+                className="rounded-md p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600 focus-visible:ring-2 focus-visible:ring-red-300 focus-visible:outline-none dark:hover:bg-red-950"
+                aria-label={t('slots.delete')}
+              >
+                <Trash2 size={15} />
+              </button>
+            </Tooltip>
           </div>
         ),
       },
