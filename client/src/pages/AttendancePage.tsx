@@ -64,6 +64,7 @@ export function AttendancePage() {
     ? new Intl.DateTimeFormat(i18n.resolvedLanguage ?? 'en', {
         hour: '2-digit',
         minute: '2-digit',
+        hour12: false,
       }).format(new Date(s.since))
     : null;
 

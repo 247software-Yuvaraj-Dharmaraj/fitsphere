@@ -32,7 +32,14 @@ export function AttendanceCalendar({ year, month, attendedDays, onPrev, onNext, 
     ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
   ];
 
-  const weekdays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  // Localized single-letter weekday headers (Jan 7 2024 is a Sunday).
+  const weekdayFmt = new Intl.DateTimeFormat(i18n.resolvedLanguage ?? 'en', {
+    weekday: 'narrow',
+    timeZone: 'UTC',
+  });
+  const weekdays = Array.from({ length: 7 }, (_, i) =>
+    weekdayFmt.format(new Date(Date.UTC(2024, 0, 7 + i))),
+  );
 
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
