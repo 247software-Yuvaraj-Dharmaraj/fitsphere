@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { ColumnDef } from '@tanstack/react-table';
+import type { ColumnDef, OnChangeFn, SortingState } from '@tanstack/react-table';
 import {
   Area,
   AreaChart,
@@ -33,9 +33,29 @@ export function AnalyticsPage() {
   const { t, i18n } = useTranslation();
   const overview = useAnalyticsOverview();
 
+  const PAGE_SIZE = 10;
   const [search, setSearch] = useState('');
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'totalVisits', desc: true }]);
+  const [page, setPage] = useState(0);
   const debounced = useDebounce(search, 300);
-  const members = useMembers(debounced);
+
+  // Reset to the first page whenever the search term changes.
+  useEffect(() => setPage(0), [debounced]);
+
+  const sortState = sorting[0] ?? { id: 'totalVisits', desc: true };
+  const members = useMembers({
+    q: debounced,
+    page,
+    pageSize: PAGE_SIZE,
+    sort: sortState.id as 'name' | 'totalVisits' | 'thisWeek' | 'lastVisit' | 'status',
+    dir: sortState.desc ? 'desc' : 'asc',
+  });
+
+  // Changing sort resets to the first page.
+  const handleSortingChange: OnChangeFn<SortingState> = (updater) => {
+    setSorting((prev) => (typeof updater === 'function' ? updater(prev) : updater));
+    setPage(0);
+  };
 
   const o = overview.data;
   const peakLabel = o?.totals.peakHour != null ? `${o.totals.peakHour}:00` : '—';
@@ -148,9 +168,20 @@ export function AnalyticsPage() {
             />
           </div>
         </div>
-        <div className={members.isFetching ? 'opacity-60 transition' : 'transition'}>
-          <DataGrid columns={columns} data={members.data ?? []} emptyText={t('analytics.noMembers')} />
-        </div>
+        <DataGrid
+          columns={columns}
+          data={members.data?.rows ?? []}
+          emptyText={t('analytics.noMembers')}
+          sorting={sorting}
+          onSortingChange={handleSortingChange}
+          loading={members.isFetching}
+          pagination={{
+            page,
+            pageSize: PAGE_SIZE,
+            total: members.data?.total ?? 0,
+            onPageChange: setPage,
+          }}
+        />
       </section>
     </div>
   );
