@@ -15,7 +15,7 @@ function pad(n: number) {
 }
 
 export function AttendanceCalendar({ year, month, attendedDays, onPrev, onNext, loading }: Props) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const firstDay = new Date(Date.UTC(year, month - 1, 1));
   const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
   const startWeekday = firstDay.getUTCDay(); // 0 Sun
@@ -39,14 +39,16 @@ export function AttendanceCalendar({ year, month, attendedDays, onPrev, onNext, 
       <div className="mb-3 flex items-center justify-between">
         <button
           onClick={onPrev}
-          className="rounded-md p-1 text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+          aria-label={t('common.previous')}
+          className="rounded-md p-1 text-slate-500 hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-brand-300 focus-visible:outline-none dark:text-slate-400 dark:hover:bg-slate-800"
         >
           <ChevronLeft size={18} />
         </button>
         <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">{monthLabel}</span>
         <button
           onClick={onNext}
-          className="rounded-md p-1 text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+          aria-label={t('common.next')}
+          className="rounded-md p-1 text-slate-500 hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-brand-300 focus-visible:outline-none dark:text-slate-400 dark:hover:bg-slate-800"
         >
           <ChevronRight size={18} />
         </button>

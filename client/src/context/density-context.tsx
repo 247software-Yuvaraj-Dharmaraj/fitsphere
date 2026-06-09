@@ -12,6 +12,7 @@ type Density = 'comfortable' | 'compact';
 interface DensityContextValue {
   density: Density;
   toggleDensity: () => void;
+  setDensity: (density: Density) => void;
 }
 
 const DensityContext = createContext<DensityContextValue | undefined>(undefined);
@@ -32,7 +33,9 @@ export function DensityProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <DensityContext.Provider value={{ density, toggleDensity }}>{children}</DensityContext.Provider>
+    <DensityContext.Provider value={{ density, toggleDensity, setDensity }}>
+      {children}
+    </DensityContext.Provider>
   );
 }
 

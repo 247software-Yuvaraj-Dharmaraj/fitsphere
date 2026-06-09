@@ -192,9 +192,11 @@ export function AnalyticsPage() {
             <div className="relative">
               <Search size={15} className="absolute top-2.5 left-2 text-slate-400" />
               <input
+                type="search"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={t('analytics.searchPlaceholder')}
+                aria-label={t('analytics.searchPlaceholder')}
                 className={`${fieldClasses} pl-8`}
               />
             </div>

@@ -3,7 +3,7 @@ import { Languages } from 'lucide-react';
 import { SUPPORTED_LANGUAGES } from '../i18n';
 
 export function LanguageSwitcher() {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const current = i18n.resolvedLanguage ?? 'en';
 
   return (
@@ -12,6 +12,7 @@ export function LanguageSwitcher() {
       <select
         value={current}
         onChange={(e) => i18n.changeLanguage(e.target.value)}
+        aria-label={t('common.language')}
         className="rounded-md border border-slate-200 bg-white px-2 py-1 text-sm focus:border-brand-500 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
       >
         {SUPPORTED_LANGUAGES.map((lang) => (

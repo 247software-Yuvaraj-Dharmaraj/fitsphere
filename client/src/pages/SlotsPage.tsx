@@ -52,14 +52,16 @@ export function SlotsPage() {
       <Card className="mb-6 flex items-center justify-between px-4 py-3">
         <button
           onClick={() => setDate((d) => shiftDay(d, -1))}
-          className="rounded-md p-1 text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+          aria-label={t('common.previous')}
+          className="rounded-md p-1 text-slate-500 hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-brand-300 focus-visible:outline-none dark:text-slate-400 dark:hover:bg-slate-800"
         >
           <ChevronLeft size={18} />
         </button>
         <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">{dateLabel}</span>
         <button
           onClick={() => setDate((d) => shiftDay(d, 1))}
-          className="rounded-md p-1 text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+          aria-label={t('common.next')}
+          className="rounded-md p-1 text-slate-500 hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-brand-300 focus-visible:outline-none dark:text-slate-400 dark:hover:bg-slate-800"
         >
           <ChevronRight size={18} />
         </button>
@@ -176,14 +178,16 @@ function AdminSlots({ date }: { date: string }) {
           <div className="flex justify-end gap-1">
             <button
               onClick={() => setDrawer({ mode: 'edit', slot: row.original })}
-              className="rounded-md p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800"
+              className="rounded-md p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 focus-visible:ring-2 focus-visible:ring-brand-300 focus-visible:outline-none dark:hover:bg-slate-800"
+              aria-label={t('slots.edit')}
               title={t('slots.edit')}
             >
               <Pencil size={15} />
             </button>
             <button
               onClick={() => setConfirm({ kind: 'single', slot: row.original })}
-              className="rounded-md p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950"
+              className="rounded-md p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600 focus-visible:ring-2 focus-visible:ring-red-300 focus-visible:outline-none dark:hover:bg-red-950"
+              aria-label={t('slots.delete')}
               title={t('slots.delete')}
             >
               <Trash2 size={15} />
@@ -333,8 +337,11 @@ function SlotForm({
       className="space-y-4"
     >
       <div>
-        <label className={`mb-1 block ${labelClasses}`}>{t('slots.startTime')}</label>
+        <label htmlFor="slot-start" className={`mb-1 block ${labelClasses}`}>
+          {t('slots.startTime')}
+        </label>
         <input
+          id="slot-start"
           type="time"
           value={v.startTime}
           onChange={(e) => setV((s) => ({ ...s, startTime: e.target.value }))}
@@ -342,8 +349,11 @@ function SlotForm({
         />
       </div>
       <div>
-        <label className={`mb-1 block ${labelClasses}`}>{t('slots.endTime')}</label>
+        <label htmlFor="slot-end" className={`mb-1 block ${labelClasses}`}>
+          {t('slots.endTime')}
+        </label>
         <input
+          id="slot-end"
           type="time"
           value={v.endTime}
           onChange={(e) => setV((s) => ({ ...s, endTime: e.target.value }))}
@@ -351,8 +361,11 @@ function SlotForm({
         />
       </div>
       <div>
-        <label className={`mb-1 block ${labelClasses}`}>{t('slots.capacityLabel')}</label>
+        <label htmlFor="slot-capacity" className={`mb-1 block ${labelClasses}`}>
+          {t('slots.capacityLabel')}
+        </label>
         <input
+          id="slot-capacity"
           type="number"
           min={1}
           value={v.capacity}

@@ -13,6 +13,7 @@ import type { ComponentType } from 'react';
 import { useAuth } from '../features/auth/useAuth';
 import type { Role } from '../features/auth/auth.types';
 import { useRealtimeOccupancy } from '../lib/useRealtimeOccupancy';
+import { usePreferenceSync } from '../lib/usePreferenceSync';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { ThemeToggle } from './theme-toggle';
 import { DensityToggle } from './density-toggle';
@@ -37,6 +38,7 @@ export function AppLayout() {
   const { user, signout } = useAuth();
   const navigate = useNavigate();
   useRealtimeOccupancy(); // live occupancy pushes while signed in
+  usePreferenceSync(); // theme/density/locale follow the account
 
   const items = NAV_ITEMS.filter((i) => !i.roles || (user && i.roles.includes(user.role)));
 
@@ -47,6 +49,12 @@ export function AppLayout() {
 
   return (
     <div className="flex min-h-screen flex-col bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+      <a
+        href="#main-content"
+        className="sr-only rounded-md bg-brand-600 px-3 py-2 text-sm font-medium text-white focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-50"
+      >
+        {t('common.skipToContent')}
+      </a>
       {/* Header */}
       <header className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 dark:border-slate-800 dark:bg-slate-900">
         <div className="flex items-center gap-2 font-semibold text-brand-700 dark:text-brand-500">
@@ -84,7 +92,7 @@ export function AppLayout() {
         </aside>
 
         {/* Main content */}
-        <main className="flex-1 p-4 pb-20 md:p-8 md:pb-8">
+        <main id="main-content" tabIndex={-1} className="flex-1 p-4 pb-20 outline-none md:p-8 md:pb-8">
           <Outlet />
         </main>
       </div>

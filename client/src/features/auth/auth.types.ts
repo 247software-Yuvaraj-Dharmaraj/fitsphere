@@ -1,11 +1,18 @@
 export type Role = 'MEMBER' | 'TRAINER' | 'ADMIN';
 
+export interface UserPreferences {
+  theme: 'light' | 'dark';
+  density: 'comfortable' | 'compact';
+  locale: string;
+}
+
 export interface User {
   id: string;
   name: string;
   email: string;
   mobile?: string;
   role: Role;
+  preferences: UserPreferences;
 }
 
 export interface AuthResponse {
