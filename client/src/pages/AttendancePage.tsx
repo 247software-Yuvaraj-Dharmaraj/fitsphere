@@ -11,12 +11,16 @@ import {
 import { AttendanceCalendar } from '../features/attendance/AttendanceCalendar';
 import type { CrowdLevel } from '../features/attendance/attendance.api';
 import { getApiErrorMessage } from '../lib/api';
+import { PageHeader } from '../components/ui/page-header';
+import { Card } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Badge, type BadgeTone } from '../components/ui/badge';
 
-const LEVEL_STYLES: Record<CrowdLevel, string> = {
-  LOW: 'bg-green-100 text-green-700',
-  MEDIUM: 'bg-amber-100 text-amber-700',
-  HIGH: 'bg-orange-100 text-orange-700',
-  FULL: 'bg-red-100 text-red-700',
+const LEVEL_TONE: Record<CrowdLevel, BadgeTone> = {
+  LOW: 'green',
+  MEDIUM: 'amber',
+  HIGH: 'orange',
+  FULL: 'red',
 };
 
 export function AttendancePage() {
@@ -65,58 +69,43 @@ export function AttendancePage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <header>
-        <h1 className="text-2xl font-bold text-slate-800">{t('pages.attendance.title')}</h1>
-        <p className="mt-1 text-slate-500">{t('pages.attendance.subtitle')}</p>
-      </header>
+      <PageHeader title={t('pages.attendance.title')} subtitle={t('pages.attendance.subtitle')} />
 
       {/* Today / check-in card */}
-      <section className="rounded-xl border border-slate-200 bg-white p-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-sm text-slate-500">
-            <Users size={16} />
-            {occupancy ? (
-              <span>
-                {occupancy.activeCount}/{occupancy.capacity} {t('attendance.inGym')}
-                <span
-                  className={`ml-2 rounded-full px-2 py-0.5 text-xs font-medium ${LEVEL_STYLES[occupancy.level]}`}
-                >
-                  {t(`attendance.levels.${occupancy.level}`)} · {occupancy.percent}%
-                </span>
-              </span>
-            ) : (
-              <span>{t('common.loading')}</span>
-            )}
-          </div>
+      <Card className="p-6">
+        <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+          <Users size={16} />
+          {occupancy ? (
+            <span className="flex items-center gap-2">
+              {occupancy.activeCount}/{occupancy.capacity} {t('attendance.inGym')}
+              <Badge tone={LEVEL_TONE[occupancy.level]}>
+                {t(`attendance.levels.${occupancy.level}`)} · {occupancy.percent}%
+              </Badge>
+            </span>
+          ) : (
+            <span>{t('common.loading')}</span>
+          )}
         </div>
 
         <div className="mt-6 flex flex-col items-center gap-3">
-          <p className="text-slate-600">
+          <p className="text-slate-600 dark:text-slate-300">
             {s?.checkedIn
               ? t('attendance.checkedInSince', { time: sinceLabel })
               : t('attendance.notCheckedIn')}
           </p>
           {s?.checkedIn ? (
-            <button
-              onClick={handleCheckOut}
-              disabled={busy}
-              className="flex items-center gap-2 rounded-lg bg-slate-800 px-6 py-3 font-medium text-white hover:bg-slate-900 disabled:opacity-60"
-            >
+            <Button variant="secondary" size="md" onClick={handleCheckOut} disabled={busy} className="px-6 py-3">
               <LogOut size={18} />
               {t('attendance.checkOut')}
-            </button>
+            </Button>
           ) : (
-            <button
-              onClick={handleCheckIn}
-              disabled={busy || occupancy?.level === 'FULL'}
-              className="flex items-center gap-2 rounded-lg bg-brand-600 px-6 py-3 font-medium text-white hover:bg-brand-700 disabled:opacity-60"
-            >
+            <Button onClick={handleCheckIn} disabled={busy || occupancy?.level === 'FULL'} className="px-6 py-3">
               <LogIn size={18} />
               {occupancy?.level === 'FULL' ? t('attendance.full') : t('attendance.checkIn')}
-            </button>
+            </Button>
           )}
         </div>
-      </section>
+      </Card>
 
       {/* Streak + totals */}
       <section className="grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -134,17 +123,10 @@ export function AttendancePage() {
       {s && (
         <section className="flex flex-wrap gap-2">
           {([3, 7, 14] as const).map((m) => (
-            <span
-              key={m}
-              className={`rounded-full px-3 py-1 text-sm font-medium ${
-                s.milestones[m]
-                  ? 'bg-brand-100 text-brand-700'
-                  : 'bg-slate-100 text-slate-400'
-              }`}
-            >
+            <Badge key={m} tone={s.milestones[m] ? 'green' : 'slate'}>
               {s.milestones[m] ? '🔥 ' : ''}
               {t('attendance.dayStreak', { count: m })}
-            </span>
+            </Badge>
           ))}
         </section>
       )}
@@ -172,12 +154,12 @@ function StatCard({
   value: string;
 }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4">
-      <div className="flex items-center gap-1 text-xs text-slate-500">
+    <Card className="p-4">
+      <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
         {icon}
         {label}
       </div>
-      <div className="mt-1 text-xl font-bold text-slate-800">{value}</div>
-    </div>
+      <div className="mt-1 text-xl font-bold text-slate-800 dark:text-slate-100">{value}</div>
+    </Card>
   );
 }

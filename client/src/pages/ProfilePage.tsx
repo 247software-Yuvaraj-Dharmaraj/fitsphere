@@ -11,6 +11,12 @@ import {
 } from '../features/feedback/feedback.hooks';
 import { FeedbackTimeline } from '../features/feedback/FeedbackTimeline';
 import { getApiErrorMessage } from '../lib/api';
+import { PageHeader } from '../components/ui/page-header';
+import { Card } from '../components/ui/card';
+import { Select } from '../components/ui/select';
+import { Button } from '../components/ui/button';
+import { Badge } from '../components/ui/badge';
+import { fieldClasses } from '../components/ui/field';
 
 export function ProfilePage() {
   const { t } = useTranslation();
@@ -18,51 +24,48 @@ export function ProfilePage() {
   const isStaff = user?.role === 'ADMIN' || user?.role === 'TRAINER';
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
-      <header>
-        <h1 className="text-2xl font-bold text-slate-800">{t('pages.profile.title')}</h1>
-        <p className="mt-1 text-slate-500">{t('pages.profile.subtitle')}</p>
-      </header>
+    <div className="mx-auto max-w-2xl">
+      <PageHeader title={t('pages.profile.title')} subtitle={t('pages.profile.subtitle')} />
 
       {/* Account card */}
-      <section className="rounded-xl border border-slate-200 bg-white p-6">
+      <Card className="mb-6 p-6">
         <div className="flex items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-100 text-brand-600">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-100 text-brand-600 dark:bg-brand-500/20 dark:text-brand-400">
             <UserCircle size={32} />
           </div>
           <div>
-            <p className="text-lg font-semibold text-slate-800">{user?.name}</p>
-            <p className="flex items-center gap-1 text-sm text-slate-500">
+            <p className="text-lg font-semibold text-slate-800 dark:text-slate-100">{user?.name}</p>
+            <p className="flex items-center gap-1 text-sm text-slate-500 dark:text-slate-400">
               <Mail size={14} /> {user?.email}
             </p>
           </div>
-          <span className="ml-auto flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-600">
-            <Shield size={14} />
-            {t(`roles.${user?.role}`)}
+          <span className="ml-auto">
+            <Badge tone="slate">
+              <Shield size={12} className="mr-1" />
+              {t(`roles.${user?.role}`)}
+            </Badge>
           </span>
         </div>
-      </section>
+      </Card>
 
       {isStaff ? <StaffFeedback /> : <MemberFeedback />}
     </div>
   );
 }
 
-// Member: read-only timeline of feedback from trainers.
 function MemberFeedback() {
   const { t } = useTranslation();
   const { data, isLoading } = useMyFeedback();
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-6">
-      <h2 className="mb-4 text-sm font-semibold text-slate-700">
+    <Card className="p-6">
+      <h2 className="mb-4 text-sm font-semibold text-slate-700 dark:text-slate-200">
         {t('profile.feedbackFromTrainers')}
       </h2>
       <FeedbackTimeline items={data} loading={isLoading} emptyText={t('profile.noFeedback')} />
-    </section>
+    </Card>
   );
 }
 
-// Trainer/Admin: pick a member, give feedback, see their timeline.
 function StaffFeedback() {
   const { t } = useTranslation();
   const members = useFeedbackMembers();
@@ -86,21 +89,17 @@ function StaffFeedback() {
   }
 
   return (
-    <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-6">
-      <h2 className="text-sm font-semibold text-slate-700">{t('profile.giveFeedback')}</h2>
+    <Card className="space-y-4 p-6">
+      <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+        {t('profile.giveFeedback')}
+      </h2>
 
-      <select
+      <Select
         value={memberId}
         onChange={(e) => setMemberId(e.target.value)}
-        className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
-      >
-        <option value="">{t('profile.selectMember')}</option>
-        {members.data?.map((m) => (
-          <option key={m.id} value={m.id}>
-            {m.name} ({m.email})
-          </option>
-        ))}
-      </select>
+        placeholder={t('profile.selectMember')}
+        options={(members.data ?? []).map((m) => ({ value: m.id, label: `${m.name} (${m.email})` }))}
+      />
 
       <textarea
         value={note}
@@ -108,19 +107,15 @@ function StaffFeedback() {
         rows={3}
         placeholder={t('profile.notePlaceholder')}
         disabled={!memberId}
-        className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none disabled:bg-slate-50"
+        className={`${fieldClasses} disabled:bg-slate-50 dark:disabled:bg-slate-800/50`}
       />
-      <button
-        onClick={submit}
-        disabled={!memberId || !note.trim() || create.isPending}
-        className="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-60"
-      >
+      <Button onClick={submit} disabled={!memberId || !note.trim() || create.isPending}>
         {t('profile.submit')}
-      </button>
+      </Button>
 
       {memberId && (
-        <div className="border-t border-slate-100 pt-4">
-          <h3 className="mb-3 text-xs font-semibold uppercase text-slate-400">
+        <div className="border-t border-slate-100 pt-4 dark:border-slate-800">
+          <h3 className="mb-3 text-xs font-semibold uppercase text-slate-400 dark:text-slate-500">
             {t('profile.memberFeedback')}
           </h3>
           <FeedbackTimeline
@@ -130,6 +125,6 @@ function StaffFeedback() {
           />
         </div>
       )}
-    </section>
+    </Card>
   );
 }

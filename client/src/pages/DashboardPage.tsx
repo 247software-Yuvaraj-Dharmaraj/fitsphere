@@ -25,6 +25,10 @@ import {
 } from '../features/workouts/workouts.hooks';
 import type { WorkoutType } from '../features/workouts/workouts.api';
 import { getApiErrorMessage } from '../lib/api';
+import { PageHeader } from '../components/ui/page-header';
+import { Card } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { fieldClasses } from '../components/ui/field';
 
 const WORKOUT_TYPES: WorkoutType[] = ['CARDIO', 'STRENGTH', 'MIXED'];
 const TYPE_COLORS: Record<WorkoutType, string> = {
@@ -32,6 +36,7 @@ const TYPE_COLORS: Record<WorkoutType, string> = {
   STRENGTH: '#16a34a',
   MIXED: '#f59e0b',
 };
+const tickStyle = { fontSize: 11, fill: '#94a3b8' };
 
 export function DashboardPage() {
   const { t, i18n } = useTranslation();
@@ -57,10 +62,7 @@ export function DashboardPage() {
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
-      <header>
-        <h1 className="text-2xl font-bold text-slate-800">{t('pages.dashboard.title')}</h1>
-        <p className="mt-1 text-slate-500">{t('pages.dashboard.subtitle')}</p>
-      </header>
+      <PageHeader title={t('pages.dashboard.title')} subtitle={t('pages.dashboard.subtitle')} />
 
       {/* Stat cards */}
       <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -68,48 +70,32 @@ export function DashboardPage() {
           Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
         ) : (
           <>
-            <StatCard
-              icon={<Flame size={18} className="text-orange-500" />}
-              label={t('attendance.streak')}
-              value={summary.data ? `${summary.data.streak}` : '—'}
-            />
-            <StatCard
-              icon={<Target size={18} className="text-brand-600" />}
-              label={t('dashboard.consistency')}
-              value={trend.data ? `${trend.data.consistency}%` : '—'}
-            />
-            <StatCard
-              icon={<Dumbbell size={18} className="text-slate-600" />}
-              label={t('dashboard.workoutsThisWeek')}
-              value={stats.data ? `${stats.data.thisWeekSessions}` : '—'}
-            />
-            <StatCard
-              icon={<CalendarCheck size={18} className="text-green-600" />}
-              label={t('dashboard.visitsThisWeek')}
-              value={summary.data ? `${summary.data.totals.thisWeek}` : '—'}
-            />
+            <StatCard icon={<Flame size={18} className="text-orange-500" />} label={t('attendance.streak')} value={summary.data ? `${summary.data.streak}` : '—'} />
+            <StatCard icon={<Target size={18} className="text-brand-600" />} label={t('dashboard.consistency')} value={trend.data ? `${trend.data.consistency}%` : '—'} />
+            <StatCard icon={<Dumbbell size={18} className="text-slate-500" />} label={t('dashboard.workoutsThisWeek')} value={stats.data ? `${stats.data.thisWeekSessions}` : '—'} />
+            <StatCard icon={<CalendarCheck size={18} className="text-green-600" />} label={t('dashboard.visitsThisWeek')} value={summary.data ? `${summary.data.totals.thisWeek}` : '—'} />
           </>
         )}
       </section>
 
       {/* Best time to train */}
-      <section className="flex flex-wrap items-center gap-3 rounded-xl border border-brand-100 bg-brand-50 p-4">
-        <Clock size={20} className="text-brand-600" />
+      <Card className="flex flex-wrap items-center gap-3 border-brand-100 bg-brand-50 p-4 dark:border-brand-500/20 dark:bg-brand-500/10">
+        <Clock size={20} className="text-brand-600 dark:text-brand-400" />
         {bestTime.isLoading ? (
           <Skeleton className="h-5 w-64" />
         ) : bestTime.data?.suggestion != null ? (
-          <p className="text-sm text-slate-700">
+          <p className="text-sm text-slate-700 dark:text-slate-200">
             <span className="font-semibold">{t('dashboard.bestTime')}:</span>{' '}
             {t('dashboard.bestTimeHint', { time: formatHour(bestTime.data.suggestion) })}
-            <span className="ml-2 text-slate-500">
+            <span className="ml-2 text-slate-500 dark:text-slate-400">
               ({t('dashboard.quietHours')}:{' '}
               {bestTime.data.quietest.map((q) => formatHour(q.hour)).join(', ')})
             </span>
           </p>
         ) : (
-          <p className="text-sm text-slate-500">{t('dashboard.bestTimeNoData')}</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{t('dashboard.bestTimeNoData')}</p>
         )}
-      </section>
+      </Card>
 
       {/* Charts */}
       {trend.isLoading || stats.isLoading ? (
@@ -118,70 +104,64 @@ export function DashboardPage() {
           <SkeletonPanel />
         </section>
       ) : (
-      <section className="grid gap-4 lg:grid-cols-2">
-        <Card title={t('dashboard.attendanceTrend')} subtitle={t('dashboard.last14days')}>
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={trendData}>
-              <XAxis dataKey="label" tick={{ fontSize: 11 }} interval={1} />
-              <Tooltip
-                cursor={{ fill: '#f1f5f9' }}
-                formatter={(v) => [Number(v) ? t('dashboard.present') : t('dashboard.absent'), '']}
-              />
-              <Bar dataKey="present" radius={[3, 3, 0, 0]} fill="#16a34a" />
-            </BarChart>
-          </ResponsiveContainer>
-        </Card>
-
-        <Card title={t('dashboard.workoutMix')}>
-          {pieData.length === 0 ? (
-            <EmptyHint text={t('dashboard.noWorkouts')} />
-          ) : (
+        <section className="grid gap-4 lg:grid-cols-2">
+          <ChartCard title={t('dashboard.attendanceTrend')} subtitle={t('dashboard.last14days')}>
             <ResponsiveContainer width="100%" height={200}>
-              <PieChart>
-                <Pie data={pieData} dataKey="value" nameKey="type" innerRadius={45} outerRadius={75}>
-                  {pieData.map((d) => (
-                    <Cell key={d.type} fill={TYPE_COLORS[d.type]} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(v, n) => [v, t(`dashboard.types.${String(n)}`)]} />
-              </PieChart>
+              <BarChart data={trendData}>
+                <XAxis dataKey="label" tick={tickStyle} interval={1} />
+                <Tooltip
+                  cursor={{ fill: 'rgba(148,163,184,0.15)' }}
+                  formatter={(v) => [Number(v) ? t('dashboard.present') : t('dashboard.absent'), '']}
+                />
+                <Bar dataKey="present" radius={[3, 3, 0, 0]} fill="#16a34a" />
+              </BarChart>
             </ResponsiveContainer>
-          )}
-          {pieData.length > 0 && (
-            <div className="mt-2 flex flex-wrap justify-center gap-3 text-xs">
-              {pieData.map((d) => (
-                <span key={d.type} className="flex items-center gap-1 text-slate-600">
-                  <span
-                    className="inline-block h-2 w-2 rounded-full"
-                    style={{ background: TYPE_COLORS[d.type] }}
-                  />
-                  {t(`dashboard.types.${d.type}`)}
-                </span>
-              ))}
-            </div>
-          )}
-        </Card>
-      </section>
+          </ChartCard>
+
+          <ChartCard title={t('dashboard.workoutMix')}>
+            {pieData.length === 0 ? (
+              <EmptyHint text={t('dashboard.noWorkouts')} />
+            ) : (
+              <ResponsiveContainer width="100%" height={200}>
+                <PieChart>
+                  <Pie data={pieData} dataKey="value" nameKey="type" innerRadius={45} outerRadius={75}>
+                    {pieData.map((d) => (
+                      <Cell key={d.type} fill={TYPE_COLORS[d.type]} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(v, n) => [v, t(`dashboard.types.${String(n)}`)]} />
+                </PieChart>
+              </ResponsiveContainer>
+            )}
+            {pieData.length > 0 && (
+              <div className="mt-2 flex flex-wrap justify-center gap-3 text-xs">
+                {pieData.map((d) => (
+                  <span key={d.type} className="flex items-center gap-1 text-slate-600 dark:text-slate-300">
+                    <span className="inline-block h-2 w-2 rounded-full" style={{ background: TYPE_COLORS[d.type] }} />
+                    {t(`dashboard.types.${d.type}`)}
+                  </span>
+                ))}
+              </div>
+            )}
+          </ChartCard>
+        </section>
       )}
 
       {/* Quick log + recent */}
       <section className="grid gap-4 lg:grid-cols-2">
-        <Card title={t('dashboard.logWorkout')}>
+        <ChartCard title={t('dashboard.logWorkout')}>
           <LogWorkoutForm />
-        </Card>
-        <Card title={t('dashboard.recentWorkouts')}>
+        </ChartCard>
+        <ChartCard title={t('dashboard.recentWorkouts')}>
           {recent.data && recent.data.length > 0 ? (
-            <ul className="divide-y divide-slate-100">
+            <ul className="divide-y divide-slate-100 dark:divide-slate-800">
               {recent.data.map((w) => (
                 <li key={w.id} className="flex items-center justify-between py-2 text-sm">
-                  <span className="flex items-center gap-2">
-                    <span
-                      className="inline-block h-2 w-2 rounded-full"
-                      style={{ background: TYPE_COLORS[w.type] }}
-                    />
+                  <span className="flex items-center gap-2 text-slate-700 dark:text-slate-200">
+                    <span className="inline-block h-2 w-2 rounded-full" style={{ background: TYPE_COLORS[w.type] }} />
                     {t(`dashboard.types.${w.type}`)}
                   </span>
-                  <span className="text-slate-500">
+                  <span className="text-slate-500 dark:text-slate-400">
                     {w.durationMin} {t('dashboard.minutes')} ·{' '}
                     {new Intl.DateTimeFormat(i18n.resolvedLanguage ?? 'en', {
                       day: 'numeric',
@@ -194,7 +174,7 @@ export function DashboardPage() {
           ) : (
             <EmptyHint text={t('dashboard.noWorkouts')} />
           )}
-        </Card>
+        </ChartCard>
       </section>
     </div>
   );
@@ -225,8 +205,8 @@ function LogWorkoutForm() {
             onClick={() => setType(wt)}
             className={`flex-1 rounded-md border px-2 py-2 text-sm font-medium ${
               type === wt
-                ? 'border-brand-500 bg-brand-50 text-brand-700'
-                : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-400'
+                : 'border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800'
             }`}
           >
             {t(`dashboard.types.${wt}`)}
@@ -234,28 +214,24 @@ function LogWorkoutForm() {
         ))}
       </div>
       <div className="flex items-center gap-2">
-        <label className="text-sm text-slate-600">{t('dashboard.duration')}</label>
+        <label className="text-sm text-slate-600 dark:text-slate-300">{t('dashboard.duration')}</label>
         <input
           type="number"
           min={1}
           value={durationMin}
           onChange={(e) => setDurationMin(Number(e.target.value))}
-          className="w-20 rounded-md border border-slate-300 px-2 py-1 text-sm"
+          className={`${fieldClasses} w-24`}
         />
-        <span className="text-sm text-slate-400">{t('dashboard.minutes')}</span>
+        <span className="text-sm text-slate-400 dark:text-slate-500">{t('dashboard.minutes')}</span>
       </div>
-      <button
-        onClick={submit}
-        disabled={logWorkout.isPending}
-        className="w-full rounded-md bg-brand-600 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-60"
-      >
+      <Button onClick={submit} disabled={logWorkout.isPending} className="w-full">
         {t('dashboard.log')}
-      </button>
+      </Button>
     </div>
   );
 }
 
-function Card({
+function ChartCard({
   title,
   subtitle,
   children,
@@ -265,13 +241,13 @@ function Card({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4">
+    <Card className="p-4">
       <div className="mb-3">
-        <h2 className="text-sm font-semibold text-slate-700">{title}</h2>
-        {subtitle && <p className="text-xs text-slate-400">{subtitle}</p>}
+        <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-200">{title}</h2>
+        {subtitle && <p className="text-xs text-slate-400 dark:text-slate-500">{subtitle}</p>}
       </div>
       {children}
-    </div>
+    </Card>
   );
 }
 
@@ -285,18 +261,20 @@ function StatCard({
   value: string;
 }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4">
-      <div className="flex items-center gap-1 text-xs text-slate-500">
+    <Card className="p-4">
+      <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
         {icon}
         {label}
       </div>
-      <div className="mt-1 text-2xl font-bold text-slate-800">{value}</div>
-    </div>
+      <div className="mt-1 text-2xl font-bold text-slate-800 dark:text-slate-100">{value}</div>
+    </Card>
   );
 }
 
 function EmptyHint({ text }: { text: string }) {
   return (
-    <div className="flex h-[180px] items-center justify-center text-sm text-slate-400">{text}</div>
+    <div className="flex h-[180px] items-center justify-center text-sm text-slate-400 dark:text-slate-500">
+      {text}
+    </div>
   );
 }

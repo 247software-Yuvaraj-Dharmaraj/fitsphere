@@ -35,18 +35,24 @@ export function AttendanceCalendar({ year, month, attendedDays, onPrev, onNext, 
   const weekdays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4">
+    <div className="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
       <div className="mb-3 flex items-center justify-between">
-        <button onClick={onPrev} className="rounded-md p-1 text-slate-500 hover:bg-slate-100">
+        <button
+          onClick={onPrev}
+          className="rounded-md p-1 text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+        >
           <ChevronLeft size={18} />
         </button>
-        <span className="text-sm font-semibold text-slate-700">{monthLabel}</span>
-        <button onClick={onNext} className="rounded-md p-1 text-slate-500 hover:bg-slate-100">
+        <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">{monthLabel}</span>
+        <button
+          onClick={onNext}
+          className="rounded-md p-1 text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+        >
           <ChevronRight size={18} />
         </button>
       </div>
 
-      <div className="grid grid-cols-7 gap-1 text-center text-xs text-slate-400">
+      <div className="grid grid-cols-7 gap-1 text-center text-xs text-slate-400 dark:text-slate-500">
         {weekdays.map((d, i) => (
           <div key={i} className="py-1">
             {d}
@@ -65,7 +71,9 @@ export function AttendanceCalendar({ year, month, attendedDays, onPrev, onNext, 
               key={i}
               className={[
                 'flex aspect-square items-center justify-center rounded-md text-sm',
-                attended ? 'bg-brand-500 font-semibold text-white' : 'text-slate-600',
+                attended
+                  ? 'bg-brand-500 font-semibold text-white'
+                  : 'text-slate-600 dark:text-slate-300',
                 isToday && !attended ? 'ring-2 ring-brand-500' : '',
               ].join(' ')}
             >

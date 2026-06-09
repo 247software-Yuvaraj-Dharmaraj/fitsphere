@@ -13,6 +13,8 @@ import type { ComponentType } from 'react';
 import { useAuth } from '../features/auth/useAuth';
 import type { Role } from '../features/auth/auth.types';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { ThemeToggle } from './theme-toggle';
+import { DensityToggle } from './density-toggle';
 
 interface NavItem {
   to: string;
@@ -42,23 +44,26 @@ export function AppLayout() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
       {/* Header */}
-      <header className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3">
-        <div className="flex items-center gap-2 font-semibold text-brand-700">
+      <header className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 dark:border-slate-800 dark:bg-slate-900">
+        <div className="flex items-center gap-2 font-semibold text-brand-700 dark:text-brand-500">
           <Dumbbell size={22} />
           <span>{t('app.name')}</span>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <ThemeToggle />
+          <DensityToggle />
           <LanguageSwitcher />
           {user && (
-            <span className="hidden text-sm text-slate-600 sm:inline">
-              {user.name} · <span className="text-slate-400">{t(`roles.${user.role}`)}</span>
+            <span className="hidden text-sm text-slate-600 sm:inline dark:text-slate-300">
+              {user.name} ·{' '}
+              <span className="text-slate-400 dark:text-slate-500">{t(`roles.${user.role}`)}</span>
             </span>
           )}
           <button
             onClick={handleSignout}
-            className="flex items-center gap-1 rounded-md px-2 py-1 text-sm text-slate-500 hover:bg-slate-100 hover:text-slate-800"
+            className="flex items-center gap-1 rounded-md px-2 py-1 text-sm text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
           >
             <LogOut size={16} />
             <span className="hidden sm:inline">{t('auth.signOut')}</span>
@@ -68,7 +73,7 @@ export function AppLayout() {
 
       <div className="flex flex-1">
         {/* Sidebar (desktop) */}
-        <aside className="hidden w-56 shrink-0 border-r border-slate-200 bg-white p-3 md:block">
+        <aside className="hidden w-56 shrink-0 border-r border-slate-200 bg-white p-3 md:block dark:border-slate-800 dark:bg-slate-900">
           <nav className="space-y-1">
             {items.map((item) => (
               <NavItemLink key={item.to} item={item} />
@@ -83,14 +88,14 @@ export function AppLayout() {
       </div>
 
       {/* Bottom nav (mobile) */}
-      <nav className="fixed inset-x-0 bottom-0 z-10 flex border-t border-slate-200 bg-white md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-10 flex border-t border-slate-200 bg-white md:hidden dark:border-slate-800 dark:bg-slate-900">
         {items.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
             className={({ isActive }) =>
               `flex flex-1 flex-col items-center gap-0.5 py-2 text-xs ${
-                isActive ? 'text-brand-600' : 'text-slate-400'
+                isActive ? 'text-brand-600 dark:text-brand-500' : 'text-slate-400 dark:text-slate-500'
               }`
             }
           >
@@ -110,7 +115,9 @@ function NavItemLink({ item }: { item: NavItem }) {
       to={item.to}
       className={({ isActive }) =>
         `flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium ${
-          isActive ? 'bg-brand-50 text-brand-700' : 'text-slate-600 hover:bg-slate-100'
+          isActive
+            ? 'bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-400'
+            : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
         }`
       }
     >

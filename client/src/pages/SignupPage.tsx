@@ -5,7 +5,10 @@ import { toast } from 'sonner';
 import { useAuth } from '../features/auth/useAuth';
 import { getApiErrorMessage } from '../lib/api';
 import type { Role } from '../features/auth/auth.types';
-import { AuthShell, Field, inputClass, buttonClass } from './LoginPage';
+import { AuthShell } from './LoginPage';
+import { TextField } from '../components/ui/text-field';
+import { Select } from '../components/ui/select';
+import { Button } from '../components/ui/button';
 
 const ROLES: Role[] = ['MEMBER', 'TRAINER', 'ADMIN'];
 
@@ -48,62 +51,47 @@ export function SignupPage() {
   return (
     <AuthShell title={t('auth.createAccount')}>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <Field label={t('auth.name')}>
-          <input
-            required
-            value={form.name}
-            onChange={(e) => update('name', e.target.value)}
-            className={inputClass}
-          />
-        </Field>
-        <Field label={t('auth.email')}>
-          <input
-            type="email"
-            required
-            value={form.email}
-            onChange={(e) => update('email', e.target.value)}
-            className={inputClass}
-            autoComplete="email"
-          />
-        </Field>
-        <Field label={t('auth.mobile')}>
-          <input
-            value={form.mobile}
-            onChange={(e) => update('mobile', e.target.value)}
-            className={inputClass}
-          />
-        </Field>
-        <Field label={t('auth.password')}>
-          <input
-            type="password"
-            required
-            minLength={6}
-            value={form.password}
-            onChange={(e) => update('password', e.target.value)}
-            className={inputClass}
-            autoComplete="new-password"
-          />
-        </Field>
-        <Field label={t('auth.role')}>
-          <select
-            value={form.role}
-            onChange={(e) => update('role', e.target.value as Role)}
-            className={inputClass}
-          >
-            {ROLES.map((r) => (
-              <option key={r} value={r}>
-                {t(`roles.${r}`)}
-              </option>
-            ))}
-          </select>
-        </Field>
-        <button type="submit" disabled={submitting} className={buttonClass}>
+        <TextField
+          label={t('auth.name')}
+          required
+          value={form.name}
+          onChange={(e) => update('name', e.target.value)}
+        />
+        <TextField
+          label={t('auth.email')}
+          type="email"
+          required
+          value={form.email}
+          onChange={(e) => update('email', e.target.value)}
+          autoComplete="email"
+        />
+        <TextField
+          label={t('auth.mobile')}
+          value={form.mobile}
+          onChange={(e) => update('mobile', e.target.value)}
+        />
+        <TextField
+          label={t('auth.password')}
+          type="password"
+          required
+          minLength={6}
+          value={form.password}
+          onChange={(e) => update('password', e.target.value)}
+          autoComplete="new-password"
+        />
+        <Select
+          label={t('auth.role')}
+          value={form.role}
+          onChange={(e) => update('role', e.target.value as Role)}
+          options={ROLES.map((r) => ({ value: r, label: t(`roles.${r}`) }))}
+        />
+        <Button type="submit" disabled={submitting} className="w-full">
           {submitting ? t('auth.creatingAccount') : t('auth.signUp')}
-        </button>
+        </Button>
       </form>
-      <p className="mt-4 text-center text-sm text-slate-500">
+      <p className="mt-4 text-center text-sm text-slate-500 dark:text-slate-400">
         {t('auth.haveAccount')}{' '}
-        <Link to="/login" className="font-medium text-brand-600 hover:underline">
+        <Link to="/login" className="font-medium text-brand-600 hover:underline dark:text-brand-400">
           {t('auth.signIn')}
         </Link>
       </p>
