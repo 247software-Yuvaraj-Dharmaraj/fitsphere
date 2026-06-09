@@ -11,7 +11,7 @@ import {
   Tooltip,
   XAxis,
 } from 'recharts';
-import { Flame, Target, Dumbbell, CalendarCheck, Clock } from 'lucide-react';
+import { Flame, Target, Dumbbell, CalendarCheck, Clock, LayoutDashboard } from 'lucide-react';
 import {
   useAttendanceSummary,
   useAttendanceTrend,
@@ -66,7 +66,11 @@ export function DashboardPage() {
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
-      <PageHeader title={t('pages.dashboard.title')} subtitle={t('pages.dashboard.subtitle')} />
+      <PageHeader
+        icon={<LayoutDashboard size={24} />}
+        title={t('pages.dashboard.title')}
+        subtitle={t('pages.dashboard.subtitle')}
+      />
 
       {/* Stat cards */}
       <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -228,7 +232,7 @@ function LogWorkoutForm() {
         />
         <span className="text-sm text-slate-400 dark:text-slate-500">{t('dashboard.minutes')}</span>
       </div>
-      <Button onClick={submit} disabled={logWorkout.isPending} className="w-full">
+      <Button onClick={submit} loading={logWorkout.isPending} className="w-full">
         {t('dashboard.log')}
       </Button>
     </div>
@@ -276,5 +280,5 @@ function StatCard({
 }
 
 function EmptyHint({ text }: { text: string }) {
-  return <Empty text={text} className="h-[180px]" />;
+  return <Empty text={text} icon={<Dumbbell size={28} className="opacity-60" />} className="h-[180px]" />;
 }

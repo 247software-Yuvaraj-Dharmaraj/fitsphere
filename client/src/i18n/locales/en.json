@@ -38,7 +38,11 @@
     "reload": "Reload",
     "skipToContent": "Skip to content",
     "previous": "Previous",
-    "next": "Next"
+    "next": "Next",
+    "darkMode": "Dark mode",
+    "lightMode": "Light mode",
+    "compact": "Compact",
+    "comfortable": "Comfortable"
   },
   "attendance": {
     "checkIn": "Check In",

@@ -11,7 +11,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { Search, Users, Activity, Clock, Gauge, Download } from 'lucide-react';
+import { Search, Users, Activity, Clock, Gauge, Download, BarChart3 } from 'lucide-react';
 import { useAnalyticsOverview, useMembers } from '../features/analytics/analytics.hooks';
 import { getMembers, type MemberRow, type MemberStatus } from '../features/analytics/analytics.api';
 import { useDebounce } from '../lib/useDebounce';
@@ -135,7 +135,11 @@ export function AnalyticsPage() {
 
   return (
     <div className="mx-auto max-w-4xl">
-      <PageHeader title={t('pages.analytics.title')} subtitle={t('pages.analytics.subtitle')} />
+      <PageHeader
+        icon={<BarChart3 size={24} />}
+        title={t('pages.analytics.title')}
+        subtitle={t('pages.analytics.subtitle')}
+      />
 
       {/* KPIs */}
       {overview.isLoading ? (

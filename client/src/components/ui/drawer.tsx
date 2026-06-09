@@ -27,14 +27,14 @@ export function Drawer({ open, title, onClose, children, footer }: DrawerProps) 
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/40" onClick={onClose}>
+    <div className="fs-overlay fixed inset-0 z-50 flex justify-end bg-black/40" onClick={onClose}>
       <aside
         ref={trapRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
         onClick={(e) => e.stopPropagation()}
-        className="flex h-full w-full max-w-md flex-col border-l border-slate-200 bg-white shadow-xl dark:border-slate-800 dark:bg-slate-900"
+        className="fs-drawer flex h-full w-full max-w-md flex-col border-l border-slate-200 bg-white shadow-xl dark:border-slate-800 dark:bg-slate-900"
       >
         <header className="flex items-center justify-between border-b border-slate-200 px-5 py-4 dark:border-slate-800">
           <h2 id={titleId} className="text-base font-semibold text-slate-800 dark:text-slate-100">

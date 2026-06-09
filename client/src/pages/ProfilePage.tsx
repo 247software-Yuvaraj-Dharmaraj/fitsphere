@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { Mail, Shield, UserCircle } from 'lucide-react';
+import { Mail, Shield, UserCircle, Send } from 'lucide-react';
 import { useAuth } from '../features/auth/useAuth';
 import {
   useCreateFeedback,
@@ -25,7 +25,11 @@ export function ProfilePage() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <PageHeader title={t('pages.profile.title')} subtitle={t('pages.profile.subtitle')} />
+      <PageHeader
+        icon={<UserCircle size={24} />}
+        title={t('pages.profile.title')}
+        subtitle={t('pages.profile.subtitle')}
+      />
 
       {/* Account card */}
       <Card className="mb-6 p-6">
@@ -109,7 +113,8 @@ function StaffFeedback() {
         disabled={!memberId}
         className={`${fieldClasses} disabled:bg-slate-50 dark:disabled:bg-slate-800/50`}
       />
-      <Button onClick={submit} disabled={!memberId || !note.trim() || create.isPending}>
+      <Button onClick={submit} disabled={!memberId || !note.trim()} loading={create.isPending}>
+        {!create.isPending && <Send size={16} />}
         {t('profile.submit')}
       </Button>
 

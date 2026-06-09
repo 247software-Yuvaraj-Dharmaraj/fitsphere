@@ -1,10 +1,11 @@
 import { forwardRef, type ButtonHTMLAttributes } from 'react';
+import { Loader2 } from 'lucide-react';
 
 type Variant = 'primary' | 'secondary' | 'danger' | 'ghost';
 type Size = 'sm' | 'md';
 
 const base =
-  'inline-flex items-center justify-center gap-2 rounded-lg font-medium transition focus-visible:ring-2 focus-visible:outline-none disabled:opacity-60 disabled:pointer-events-none';
+  'inline-flex items-center justify-center gap-2 rounded-lg font-medium transition active:scale-[0.98] focus-visible:ring-2 focus-visible:outline-none disabled:opacity-60 disabled:pointer-events-none';
 
 const variants: Record<Variant, string> = {
   primary:
@@ -25,16 +26,25 @@ const sizes: Record<Size, string> = {
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
   size?: Size;
+  loading?: boolean;
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ variant = 'primary', size = 'md', className = '', type = 'button', ...props }, ref) => (
+  (
+    { variant = 'primary', size = 'md', className = '', type = 'button', loading, disabled, children, ...props },
+    ref,
+  ) => (
     <button
       ref={ref}
       type={type}
+      disabled={disabled || loading}
+      aria-busy={loading || undefined}
       className={`${base} ${variants[variant]} ${sizes[size]} ${className}`.trim()}
       {...props}
-    />
+    >
+      {loading && <Loader2 size={16} className="animate-spin" aria-hidden />}
+      {children}
+    </button>
   ),
 );
 

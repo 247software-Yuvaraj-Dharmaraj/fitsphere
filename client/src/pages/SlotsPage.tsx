@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import type { ColumnDef, RowSelectionState } from '@tanstack/react-table';
-import { ChevronLeft, ChevronRight, Pencil, Plus, Trash2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Pencil, Plus, Trash2, CalendarClock } from 'lucide-react';
 import {
   useBookSlot,
   useBulkDeleteSlots,
@@ -22,6 +22,7 @@ import { DataGrid } from '../components/ui/data-grid';
 import { Drawer } from '../components/ui/drawer';
 import { ConfirmDialog } from '../components/ui/confirm-dialog';
 import { SelectionBar } from '../components/ui/selection-bar';
+import { Tooltip } from '../components/ui/tooltip';
 import { fieldClasses, labelClasses } from '../components/ui/field';
 
 function todayKey() {
@@ -47,7 +48,11 @@ export function SlotsPage() {
 
   return (
     <div className="mx-auto max-w-3xl">
-      <PageHeader title={t('pages.slots.title')} subtitle={t('pages.slots.subtitle')} />
+      <PageHeader
+        icon={<CalendarClock size={24} />}
+        title={t('pages.slots.title')}
+        subtitle={t('pages.slots.subtitle')}
+      />
 
       <Card className="mb-6 flex items-center justify-between px-4 py-3">
         <button
@@ -176,22 +181,24 @@ function AdminSlots({ date }: { date: string }) {
         enableSorting: false,
         cell: ({ row }) => (
           <div className="flex justify-end gap-1">
-            <button
-              onClick={() => setDrawer({ mode: 'edit', slot: row.original })}
-              className="rounded-md p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 focus-visible:ring-2 focus-visible:ring-brand-300 focus-visible:outline-none dark:hover:bg-slate-800"
-              aria-label={t('slots.edit')}
-              title={t('slots.edit')}
-            >
-              <Pencil size={15} />
-            </button>
-            <button
-              onClick={() => setConfirm({ kind: 'single', slot: row.original })}
-              className="rounded-md p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600 focus-visible:ring-2 focus-visible:ring-red-300 focus-visible:outline-none dark:hover:bg-red-950"
-              aria-label={t('slots.delete')}
-              title={t('slots.delete')}
-            >
-              <Trash2 size={15} />
-            </button>
+            <Tooltip label={t('slots.edit')}>
+              <button
+                onClick={() => setDrawer({ mode: 'edit', slot: row.original })}
+                className="rounded-md p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 focus-visible:ring-2 focus-visible:ring-brand-300 focus-visible:outline-none dark:hover:bg-slate-800"
+                aria-label={t('slots.edit')}
+              >
+                <Pencil size={15} />
+              </button>
+            </Tooltip>
+            <Tooltip label={t('slots.delete')}>
+              <button
+                onClick={() => setConfirm({ kind: 'single', slot: row.original })}
+                className="rounded-md p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600 focus-visible:ring-2 focus-visible:ring-red-300 focus-visible:outline-none dark:hover:bg-red-950"
+                aria-label={t('slots.delete')}
+              >
+                <Trash2 size={15} />
+              </button>
+            </Tooltip>
           </div>
         ),
       },
@@ -286,7 +293,7 @@ function AdminSlots({ date }: { date: string }) {
             <Button variant="secondary" onClick={() => setDrawer(null)}>
               {t('common.cancel')}
             </Button>
-            <Button type="submit" form="slot-form" disabled={saving}>
+            <Button type="submit" form="slot-form" loading={saving}>
               {t('common.save')}
             </Button>
           </>

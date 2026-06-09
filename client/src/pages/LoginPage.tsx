@@ -1,7 +1,7 @@
 import { useState, type FormEvent, type ReactNode } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Dumbbell } from 'lucide-react';
+import { Dumbbell, Mail, Lock, LogIn } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '../features/auth/useAuth';
 import { getApiErrorMessage } from '../lib/api';
@@ -38,6 +38,7 @@ export function LoginPage() {
       <form onSubmit={handleSubmit} className="space-y-4">
         <TextField
           label={t('auth.email')}
+          icon={<Mail size={16} />}
           type="email"
           required
           value={email}
@@ -46,13 +47,15 @@ export function LoginPage() {
         />
         <TextField
           label={t('auth.password')}
+          icon={<Lock size={16} />}
           type="password"
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           autoComplete="current-password"
         />
-        <Button type="submit" disabled={submitting} className="w-full">
+        <Button type="submit" loading={submitting} className="w-full">
+          {!submitting && <LogIn size={16} />}
           {submitting ? t('auth.signingIn') : t('auth.signIn')}
         </Button>
       </form>

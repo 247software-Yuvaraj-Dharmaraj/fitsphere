@@ -38,3 +38,49 @@ body {
   background-color: #020617;
   color: #f1f5f9;
 }
+
+/* Micro-interactions: subtle enter animations for overlays/drawers/dialogs. */
+@keyframes fs-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes fs-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes fs-slide-in-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.fs-overlay {
+  animation: fs-fade-in 0.15s ease-out;
+}
+.fs-dialog {
+  animation: fs-scale-in 0.18s ease-out;
+}
+.fs-drawer {
+  animation: fs-slide-in-right 0.2s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fs-overlay,
+  .fs-dialog,
+  .fs-drawer {
+    animation: none;
+  }
+}
