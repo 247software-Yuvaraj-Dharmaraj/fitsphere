@@ -4,7 +4,24 @@ import type { SlotsResponse } from './slots.api';
 
 export const slotsKeys = {
   byDate: (date: string) => ['slots', date] as const,
+  myBookings: ['slots', 'my-bookings'] as const,
 };
+
+export function useMyBookings() {
+  return useQuery({
+    queryKey: slotsKeys.myBookings,
+    queryFn: ({ signal }) => api.getMyBookings(signal),
+  });
+}
+
+// Cancel from the My Bookings view — invalidates all slot queries.
+export function useCancelMyBooking() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (slotId: string) => api.cancelBooking(slotId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['slots'] }),
+  });
+}
 
 export function useSlots(date: string) {
   return useQuery({

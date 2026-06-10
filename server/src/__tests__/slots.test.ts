@@ -48,6 +48,23 @@ describe('slots', () => {
     expect(cancelled.body.bookedByMe).toBe(false);
   });
 
+  it('lists a member\'s own upcoming bookings', async () => {
+    const admin = await makeUser('ADMIN');
+    await createSlot(admin.token);
+    const list = await request(app).get(`/api/slots?date=${TODAY}`).set(auth(admin.token));
+    const slotId = list.body.slots[0].id;
+
+    const member = await makeUser('MEMBER');
+    let mine = await request(app).get('/api/slots/my-bookings').set(auth(member.token));
+    expect(mine.body).toHaveLength(0);
+
+    await request(app).post(`/api/slots/${slotId}/book`).set(auth(member.token));
+    mine = await request(app).get('/api/slots/my-bookings').set(auth(member.token));
+    expect(mine.status).toBe(200);
+    expect(mine.body).toHaveLength(1);
+    expect(mine.body[0].bookedByMe).toBe(true);
+  });
+
   it('does not overbook the last seat under concurrent bookings', async () => {
     const admin = await makeUser('ADMIN');
     await createSlot(admin.token, 1); // capacity 1

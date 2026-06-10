@@ -8,6 +8,7 @@ const router = Router();
 router.use(requireAuth);
 
 router.get('/', asyncHandler(controller.list));
+router.get('/my-bookings', asyncHandler(controller.myBookings));
 router.post('/:id/book', asyncHandler(controller.book));
 router.delete('/:id/book', asyncHandler(controller.cancel));
 
