@@ -7,6 +7,7 @@ import { ThemeProvider } from './context/theme-context';
 import { DensityProvider } from './context/density-context';
 import { AuthProvider } from './features/auth/AuthContext';
 import { ErrorBoundary } from './components/error-boundary';
+import { FullPageLoader } from './components/page-loader';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AppLayout } from './components/AppLayout';
 import { LoginPage } from './pages/LoginPage';
@@ -28,10 +29,6 @@ const ProfilePage = lazy(() =>
   import('./pages/ProfilePage').then((m) => ({ default: m.ProfilePage })),
 );
 
-function PageFallback() {
-  return <div className="flex h-64 items-center justify-center text-slate-400">Loading...</div>;
-}
-
 export default function App() {
   return (
     <ThemeProvider>
@@ -40,7 +37,7 @@ export default function App() {
         <QueryClientProvider client={queryClient}>
           <BrowserRouter>
             <AuthProvider>
-              <Suspense fallback={<PageFallback />}>
+              <Suspense fallback={<FullPageLoader />}>
                 <Routes>
                   {/* Public */}
                   <Route path="/login" element={<LoginPage />} />

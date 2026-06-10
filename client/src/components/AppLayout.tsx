@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -14,6 +15,7 @@ import { useAuth } from '../features/auth/useAuth';
 import type { Role } from '../features/auth/auth.types';
 import { useRealtimeOccupancy } from '../lib/useRealtimeOccupancy';
 import { usePreferenceSync } from '../lib/usePreferenceSync';
+import { ContentLoader } from './page-loader';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { ThemeToggle } from './theme-toggle';
 import { DensityToggle } from './density-toggle';
@@ -93,7 +95,9 @@ export function AppLayout() {
 
         {/* Main content */}
         <main id="main-content" tabIndex={-1} className="flex-1 p-4 pb-20 outline-none md:p-8 md:pb-8">
-          <Outlet />
+          <Suspense fallback={<ContentLoader />}>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
 
