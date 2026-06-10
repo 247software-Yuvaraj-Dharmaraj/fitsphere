@@ -14,6 +14,14 @@ describe('auth', () => {
     expect(res.body.user.passwordHash).toBeUndefined();
   });
 
+  it('ignores a role sent at signup — always creates a MEMBER', async () => {
+    const res = await request(app)
+      .post('/api/auth/signup')
+      .send({ name: 'Sneaky', email: 'sneaky@test.app', password: 'password123', role: 'ADMIN' });
+    expect(res.status).toBe(201);
+    expect(res.body.user.role).toBe('MEMBER');
+  });
+
   it('rejects duplicate email with 409', async () => {
     await request(app)
       .post('/api/auth/signup')
