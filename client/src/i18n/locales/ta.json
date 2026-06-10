@@ -101,7 +101,8 @@
     "deleteConfirmMass": "இது {{count}} நேரங்களையும் அவற்றின் முன்பதிவுகளையும் நிரந்தரமாக நீக்கும்.",
     "timeFormat": "24-மணி HH:MM பயன்படுத்தவும் (எ.கா. 18:30)",
     "endAfterStart": "முடிவு தொடக்கத்திற்குப் பிறகு இருக்க வேண்டும்",
-    "timePlaceholder": "HH:MM"
+    "timePlaceholder": "HH:MM",
+    "overlap": "அன்றைய நாளில் ஏற்கனவே உள்ள நேரத்துடன் மோதுகிறது"
   },
   "dashboard": {
     "consistency": "நிலைத்தன்மை",

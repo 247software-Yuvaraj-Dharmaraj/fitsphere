@@ -70,6 +70,49 @@ describe('slots', () => {
     expect(edited.body.capacity).toBe(10);
   });
 
+  it('rejects overlapping / duplicate slots on the same day', async () => {
+    const admin = await makeUser('ADMIN');
+    const first = await createSlot(admin.token); // 06:00–07:00
+    expect(first.status).toBe(201);
+
+    // exact duplicate
+    const dup = await createSlot(admin.token);
+    expect(dup.status).toBe(409);
+
+    // partial overlap (06:23–07:00)
+    const overlap = await request(app)
+      .post('/api/slots')
+      .set(auth(admin.token))
+      .send({ date: TODAY, startTime: '06:23', endTime: '07:00', capacity: 5 });
+    expect(overlap.status).toBe(409);
+
+    // adjacent, non-overlapping (07:00–08:00) is allowed
+    const ok = await request(app)
+      .post('/api/slots')
+      .set(auth(admin.token))
+      .send({ date: TODAY, startTime: '07:00', endTime: '08:00', capacity: 5 });
+    expect(ok.status).toBe(201);
+  });
+
+  it('rejects shrinking capacity below current bookings', async () => {
+    const admin = await makeUser('ADMIN');
+    await createSlot(admin.token, 2); // capacity 2
+    const list = await request(app).get(`/api/slots?date=${TODAY}`).set(auth(admin.token));
+    const slotId = list.body.slots[0].id;
+
+    const m1 = await makeUser('MEMBER');
+    const m2 = await makeUser('MEMBER');
+    await request(app).post(`/api/slots/${slotId}/book`).set(auth(m1.token));
+    await request(app).post(`/api/slots/${slotId}/book`).set(auth(m2.token));
+
+    // 2 booked → can't drop capacity to 1
+    const tooLow = await request(app)
+      .patch(`/api/slots/${slotId}`)
+      .set(auth(admin.token))
+      .send({ startTime: '06:00', endTime: '07:00', capacity: 1 });
+    expect(tooLow.status).toBe(409);
+  });
+
   it('admin can bulk-delete slots', async () => {
     const admin = await makeUser('ADMIN');
     await createSlot(admin.token);

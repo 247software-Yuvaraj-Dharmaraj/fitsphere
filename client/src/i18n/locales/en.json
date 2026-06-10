@@ -101,7 +101,8 @@
     "deleteConfirmMass": "This will permanently delete {{count}} slot(s) and their bookings.",
     "timeFormat": "Use 24-hour HH:MM (e.g. 18:30)",
     "endAfterStart": "End must be after start",
-    "timePlaceholder": "HH:MM"
+    "timePlaceholder": "HH:MM",
+    "overlap": "Overlaps an existing slot that day"
   },
   "dashboard": {
     "consistency": "Consistency",

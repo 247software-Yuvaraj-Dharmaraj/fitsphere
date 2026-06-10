@@ -10,6 +10,34 @@ function dayRange(date: string) {
   return { from, to };
 }
 
+function dayRangeOf(date: Date) {
+  const from = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+  const to = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + 1));
+  return { from, to };
+}
+
+// Two HH:MM ranges overlap if each starts before the other ends.
+// (String compare == chronological for same-day 24h "HH:MM".)
+function overlaps(aStart: string, aEnd: string, bStart: string, bEnd: string) {
+  return aStart < bEnd && bStart < aEnd;
+}
+
+// Rejects a slot whose time range overlaps an existing slot on the same day
+// (covers exact duplicates too). `excludeId` skips the slot being edited.
+async function assertNoOverlap(
+  range: { from: Date; to: Date },
+  startTime: string,
+  endTime: string,
+  excludeId?: Types.ObjectId,
+) {
+  const filter: Record<string, unknown> = { date: { $gte: range.from, $lt: range.to } };
+  if (excludeId) filter._id = { $ne: excludeId };
+  const sameDay = await Slot.find(filter).select('startTime endTime').lean<SlotDoc[]>();
+  if (sameDay.some((s) => overlaps(startTime, endTime, s.startTime, s.endTime))) {
+    throw new HttpError(409, 'This slot overlaps an existing slot on that day');
+  }
+}
+
 interface SlotDoc {
   _id: Types.ObjectId;
   date: Date;
@@ -75,9 +103,10 @@ export async function cancel(slotId: string, userId: string) {
 
 // Admin / Trainer only.
 export async function create(input: CreateSlotInput) {
-  const { from } = dayRange(input.date);
+  const range = dayRange(input.date);
+  await assertNoOverlap(range, input.startTime, input.endTime);
   return Slot.create({
-    date: from,
+    date: range.from,
     startTime: input.startTime,
     endTime: input.endTime,
     capacity: input.capacity,
@@ -87,12 +116,20 @@ export async function create(input: CreateSlotInput) {
 
 export async function update(slotId: string, input: UpdateSlotInput) {
   if (!Types.ObjectId.isValid(slotId)) throw new HttpError(404, 'Slot not found');
-  const slot = await Slot.findByIdAndUpdate(
-    slotId,
-    { startTime: input.startTime, endTime: input.endTime, capacity: input.capacity },
-    { new: true },
-  );
+  const slot = await Slot.findById(slotId);
   if (!slot) throw new HttpError(404, 'Slot not found');
+
+  // Capacity can't drop below seats already booked.
+  if (input.capacity < slot.bookings.length) {
+    throw new HttpError(409, `Capacity can't be below the ${slot.bookings.length} existing booking(s)`);
+  }
+  // No overlap with other slots that day.
+  await assertNoOverlap(dayRangeOf(slot.date), input.startTime, input.endTime, slot._id);
+
+  slot.startTime = input.startTime;
+  slot.endTime = input.endTime;
+  slot.capacity = input.capacity;
+  await slot.save();
   return toDto(slot.toObject() as SlotDoc, '');
 }
 
