@@ -1,6 +1,8 @@
-import { useEffect, useId, type ReactNode } from 'react';
+import { useCallback, useEffect, useId, useState, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import { useFocusTrap } from '../../lib/useFocusTrap';
+import { ConfirmDialog } from './confirm-dialog';
 
 interface DrawerProps {
   open: boolean;
@@ -8,26 +10,35 @@ interface DrawerProps {
   onClose: () => void;
   children: ReactNode;
   footer?: ReactNode;
+  // When true, closing (X / overlay / Escape) asks to confirm discarding edits.
+  dirty?: boolean;
 }
 
 /** Right-side slide-over panel for add/edit forms (keeps the list behind it). */
-export function Drawer({ open, title, onClose, children, footer }: DrawerProps) {
+export function Drawer({ open, title, onClose, children, footer, dirty }: DrawerProps) {
+  const { t } = useTranslation();
   const titleId = useId();
   const trapRef = useFocusTrap<HTMLElement>(open);
+  const [confirmClose, setConfirmClose] = useState(false);
+
+  const attemptClose = useCallback(() => {
+    if (dirty) setConfirmClose(true);
+    else onClose();
+  }, [dirty, onClose]);
 
   useEffect(() => {
     if (!open) return;
     function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') attemptClose();
     }
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
+  }, [open, attemptClose]);
 
   if (!open) return null;
 
   return (
-    <div className="fs-overlay fixed inset-0 z-50 flex justify-end bg-black/40" onClick={onClose}>
+    <div className="fs-overlay fixed inset-0 z-50 flex justify-end bg-black/40" onClick={attemptClose}>
       <aside
         ref={trapRef}
         role="dialog"
@@ -41,7 +52,7 @@ export function Drawer({ open, title, onClose, children, footer }: DrawerProps) 
             {title}
           </h2>
           <button
-            onClick={onClose}
+            onClick={attemptClose}
             aria-label="Close"
             className="rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700 focus-visible:ring-2 focus-visible:ring-brand-300 focus-visible:outline-none dark:hover:bg-slate-800 dark:hover:text-slate-200"
           >
@@ -55,6 +66,19 @@ export function Drawer({ open, title, onClose, children, footer }: DrawerProps) 
           </footer>
         )}
       </aside>
+
+      <ConfirmDialog
+        open={confirmClose}
+        destructive
+        title={t('common.discardTitle')}
+        message={t('common.discardMessage')}
+        confirmLabel={t('common.discard')}
+        onCancel={() => setConfirmClose(false)}
+        onConfirm={() => {
+          setConfirmClose(false);
+          onClose();
+        }}
+      />
     </div>
   );
 }
