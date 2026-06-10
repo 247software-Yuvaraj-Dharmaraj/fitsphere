@@ -12,8 +12,14 @@ import {
   YAxis,
 } from 'recharts';
 import { Search, Users, Activity, Clock, Gauge, Download, BarChart3 } from 'lucide-react';
+import { Select } from '../components/ui/select';
 import { useAnalyticsOverview, useMembers } from '../features/analytics/analytics.hooks';
-import { getMembers, type MemberRow, type MemberStatus } from '../features/analytics/analytics.api';
+import {
+  getMembers,
+  type MemberRow,
+  type MemberStatus,
+  type MemberStatusFilter,
+} from '../features/analytics/analytics.api';
 import { useDebounce } from '../lib/useDebounce';
 import { useChartTooltip } from '../lib/useChartTooltip';
 import { downloadXlsx } from '../lib/xlsx';
@@ -39,6 +45,7 @@ export function AnalyticsPage() {
 
   const PAGE_SIZE = 10;
   const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<MemberStatusFilter>('ALL');
   const [sorting, setSorting] = useState<SortingState>([{ id: 'totalVisits', desc: true }]);
   const [page, setPage] = useState(0);
   const debounced = useDebounce(search, 300);
@@ -49,6 +56,12 @@ export function AnalyticsPage() {
     setPage(0);
   }
 
+  // Changing the status filter also resets to the first page.
+  function onStatusChange(value: string) {
+    setStatusFilter(value as MemberStatusFilter);
+    setPage(0);
+  }
+
   const sortState = sorting[0] ?? { id: 'totalVisits', desc: true };
   const members = useMembers({
     q: debounced,
@@ -56,6 +69,7 @@ export function AnalyticsPage() {
     pageSize: PAGE_SIZE,
     sort: sortState.id as 'name' | 'totalVisits' | 'thisWeek' | 'lastVisit' | 'status',
     dir: sortState.desc ? 'desc' : 'asc',
+    status: statusFilter,
   });
 
   // Changing sort resets to the first page.
@@ -74,6 +88,7 @@ export function AnalyticsPage() {
         pageSize: 100,
         sort: sortState.id as 'name' | 'totalVisits' | 'thisWeek' | 'lastVisit' | 'status',
         dir: sortState.desc ? 'desc' : 'asc',
+        status: statusFilter,
       });
       await downloadXlsx(
         'fitsphere-members.xlsx',
@@ -210,6 +225,18 @@ export function AnalyticsPage() {
                 className={`${fieldClasses} pl-8`}
               />
             </div>
+            <Select
+              value={statusFilter}
+              onChange={(e) => onStatusChange(e.target.value)}
+              aria-label={t('analytics.status')}
+              className="w-auto"
+              options={[
+                { value: 'ALL', label: t('analytics.statusFilter.all') },
+                { value: 'ACTIVE', label: t('analytics.statuses.ACTIVE') },
+                { value: 'AT_RISK', label: t('analytics.statuses.AT_RISK') },
+                { value: 'INACTIVE', label: t('analytics.statuses.INACTIVE') },
+              ]}
+            />
             <Button variant="secondary" size="sm" onClick={exportXlsx} loading={exporting}>
               {!exporting && <Download size={14} />}
               {t('analytics.exportXlsx')}

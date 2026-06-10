@@ -6,6 +6,7 @@ export const membersQuerySchema = z.object({
   pageSize: z.coerce.number().int().min(1).max(100).default(10),
   sort: z.enum(['name', 'totalVisits', 'thisWeek', 'lastVisit', 'status']).default('totalVisits'),
   dir: z.enum(['asc', 'desc']).default('desc'),
+  status: z.enum(['ALL', 'ACTIVE', 'AT_RISK', 'INACTIVE']).default('ALL'),
 });
 
 export type MembersQuery = z.infer<typeof membersQuerySchema>;

@@ -159,6 +159,9 @@
       "AT_RISK": "அபாயத்தில்",
       "INACTIVE": "செயலற்ற"
     },
+    "statusFilter": {
+      "all": "அனைத்து நிலைகளும்"
+    },
     "exportXlsx": "Excel ஏற்றுமதி"
   },
   "profile": {

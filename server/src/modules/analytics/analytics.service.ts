@@ -86,7 +86,7 @@ interface MemberRowAgg {
 // aggregation (mirrors ui-service's server-driven DataGrid). Returns the page of
 // rows plus the total count.
 export async function members(query: MembersQuery) {
-  const { q, page, pageSize, sort, dir } = query;
+  const { q, page, pageSize, sort, dir, status } = query;
   const weekStart = startOfWeek();
   const now = new Date();
 
@@ -150,6 +150,8 @@ export async function members(query: MembersQuery) {
       },
     },
     { $project: { name: 1, email: 1, totalVisits: 1, thisWeek: 1, lastVisit: 1, status: 1, statusRank: 1 } },
+    // Status filter (applied after status is computed; ALL skips it).
+    ...(status !== 'ALL' ? [{ $match: { status } }] : []),
     {
       $facet: {
         rows: [{ $sort: { [sortKey]: sortDir, _id: 1 } }, { $skip: page * pageSize }, { $limit: pageSize }],

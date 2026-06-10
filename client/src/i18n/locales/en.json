@@ -159,6 +159,9 @@
       "AT_RISK": "At risk",
       "INACTIVE": "Inactive"
     },
+    "statusFilter": {
+      "all": "All statuses"
+    },
     "exportXlsx": "Export Excel"
   },
   "profile": {
