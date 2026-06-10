@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import type { ColumnDef, RowSelectionState } from '@tanstack/react-table';
-import { ChevronLeft, ChevronRight, Pencil, Plus, Trash2, CalendarClock } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Pencil, Plus, Trash2, CalendarClock, Clock } from 'lucide-react';
 import {
   useBookSlot,
   useBulkDeleteSlots,
@@ -18,13 +18,12 @@ import { getApiErrorMessage } from '../lib/api';
 import { PageHeader } from '../components/ui/page-header';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
-import { Select } from '../components/ui/select';
+import { TextField } from '../components/ui/text-field';
 import { DataGrid } from '../components/ui/data-grid';
 import { Drawer } from '../components/ui/drawer';
 import { ConfirmDialog } from '../components/ui/confirm-dialog';
 import { SelectionBar } from '../components/ui/selection-bar';
 import { Tooltip } from '../components/ui/tooltip';
-import { fieldClasses, labelClasses } from '../components/ui/field';
 
 function todayKey() {
   return new Date().toISOString().slice(0, 10);
@@ -325,19 +324,7 @@ function AdminSlots({ date }: { date: string }) {
   );
 }
 
-// Half-hour time options from 05:00 to 22:00 (e.g. "06:00", "06:30", …).
-const TIME_OPTIONS = (() => {
-  const out: string[] = [];
-  for (let m = 5 * 60; m <= 22 * 60; m += 30) {
-    out.push(`${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`);
-  }
-  return out;
-})();
-
-function nextTime(time: string): string {
-  const i = TIME_OPTIONS.indexOf(time);
-  return TIME_OPTIONS[Math.min(i + 1, TIME_OPTIONS.length - 1)];
-}
+const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/; // 24-hour HH:MM (matches the API)
 
 function SlotForm({
   initial,
@@ -353,49 +340,53 @@ function SlotForm({
     capacity: initial?.capacity ?? 15,
   });
 
-  // End must be after start; bump it if a later start is chosen.
-  function onStartChange(startTime: string) {
-    setV((s) => ({ ...s, startTime, endTime: s.endTime <= startTime ? nextTime(startTime) : s.endTime }));
-  }
-
-  const endOptions = TIME_OPTIONS.filter((tt) => tt > v.startTime);
+  // Free-form time entry with inline validation (any HH:MM, not just half-hours).
+  const startErr = TIME_RE.test(v.startTime) ? undefined : t('slots.timeFormat');
+  const endErr = !TIME_RE.test(v.endTime)
+    ? t('slots.timeFormat')
+    : v.endTime <= v.startTime
+      ? t('slots.endAfterStart')
+      : undefined;
+  const valid = !startErr && !endErr && v.capacity >= 1;
 
   return (
     <form
       id="slot-form"
       onSubmit={(e) => {
         e.preventDefault();
-        onSubmit(v);
+        if (valid) onSubmit(v);
       }}
       className="space-y-4"
+      noValidate
     >
-      <Select
+      <TextField
         id="slot-start"
         label={t('slots.startTime')}
+        icon={<Clock size={16} />}
+        placeholder={t('slots.timePlaceholder')}
+        inputMode="numeric"
         value={v.startTime}
-        onChange={(e) => onStartChange(e.target.value)}
-        options={TIME_OPTIONS.slice(0, -1).map((tt) => ({ value: tt, label: tt }))}
+        onChange={(e) => setV((s) => ({ ...s, startTime: e.target.value }))}
+        error={startErr}
       />
-      <Select
+      <TextField
         id="slot-end"
         label={t('slots.endTime')}
+        icon={<Clock size={16} />}
+        placeholder={t('slots.timePlaceholder')}
+        inputMode="numeric"
         value={v.endTime}
         onChange={(e) => setV((s) => ({ ...s, endTime: e.target.value }))}
-        options={endOptions.map((tt) => ({ value: tt, label: tt }))}
+        error={endErr}
       />
-      <div>
-        <label htmlFor="slot-capacity" className={`mb-1 block ${labelClasses}`}>
-          {t('slots.capacityLabel')}
-        </label>
-        <input
-          id="slot-capacity"
-          type="number"
-          min={1}
-          value={v.capacity}
-          onChange={(e) => setV((s) => ({ ...s, capacity: Number(e.target.value) }))}
-          className={fieldClasses}
-        />
-      </div>
+      <TextField
+        id="slot-capacity"
+        label={t('slots.capacityLabel')}
+        type="number"
+        min={1}
+        value={v.capacity}
+        onChange={(e) => setV((s) => ({ ...s, capacity: Number(e.target.value) }))}
+      />
     </form>
   );
 }
