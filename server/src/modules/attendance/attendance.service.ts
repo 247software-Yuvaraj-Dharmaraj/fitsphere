@@ -16,16 +16,23 @@ function startOfWeek(now: Date): Date {
 function startOfMonth(now: Date): Date {
   return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
 }
+function startOfDay(now: Date = new Date()): Date {
+  const d = new Date(now);
+  d.setUTCHours(0, 0, 0, 0);
+  return d;
+}
 
 async function getCapacity(): Promise<number> {
   const config = await GymConfig.findOne();
   return config?.capacity ?? 50;
 }
 
-// Live occupancy = members currently checked in (no checkout yet).
+// Live occupancy = members checked in TODAY without checking out. Restricting to
+// today prevents stale sessions (someone who forgot to check out yesterday) from
+// inflating occupancy forever.
 export async function getOccupancy() {
   const [activeCount, capacity] = await Promise.all([
-    Attendance.countDocuments({ checkOutAt: null }),
+    Attendance.countDocuments({ checkOutAt: null, checkInAt: { $gte: startOfDay() } }),
     getCapacity(),
   ]);
   const percent = capacity > 0 ? Math.round((activeCount / capacity) * 100) : 0;
@@ -38,8 +45,14 @@ export async function getOccupancy() {
 }
 
 export async function checkIn(userId: string) {
+  const today = startOfDay();
   const open = await Attendance.findOne({ user: userId, checkOutAt: null });
-  if (open) throw new HttpError(409, 'You are already checked in');
+  if (open) {
+    if (open.checkInAt >= today) throw new HttpError(409, 'You are already checked in');
+    // Forgot to check out on an earlier day — auto-close that stale session.
+    open.checkOutAt = today;
+    await open.save();
+  }
 
   // Spec rule: new check-ins are disabled at full capacity.
   const occupancy = await getOccupancy();
@@ -94,9 +107,12 @@ export async function getSummary(userId: string) {
   const thisWeek = [...dayKeys].filter((k) => new Date(k) >= weekStart).length;
   const thisMonth = [...dayKeys].filter((k) => new Date(k) >= monthStart).length;
 
+  // Only count an open session as "checked in" if it started today.
+  const checkedInToday = Boolean(open) && (open!.checkInAt as Date) >= startOfDay(now);
+
   return {
-    checkedIn: Boolean(open),
-    since: open?.checkInAt ?? null,
+    checkedIn: checkedInToday,
+    since: checkedInToday ? (open!.checkInAt ?? null) : null,
     streak,
     milestones: { 3: streak >= 3, 7: streak >= 7, 14: streak >= 14 },
     totals: { thisWeek, thisMonth, allTime: dayKeys.size },

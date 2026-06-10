@@ -70,6 +70,26 @@ describe('slots', () => {
     expect(edited.body.capacity).toBe(10);
   });
 
+  it('rejects booking a slot on a past date', async () => {
+    const { Slot } = await import('../models/index.js');
+    const yesterday = new Date();
+    yesterday.setUTCDate(yesterday.getUTCDate() - 1);
+    yesterday.setUTCHours(0, 0, 0, 0);
+    const pastSlot = await Slot.create({
+      date: yesterday,
+      startTime: '06:00',
+      endTime: '07:00',
+      capacity: 10,
+      bookings: [],
+    });
+
+    const member = await makeUser('MEMBER');
+    const res = await request(app)
+      .post(`/api/slots/${pastSlot._id}/book`)
+      .set(auth(member.token));
+    expect(res.status).toBe(409);
+  });
+
   it('rejects overlapping / duplicate slots on the same day', async () => {
     const admin = await makeUser('ADMIN');
     const first = await createSlot(admin.token); // 06:00–07:00

@@ -35,6 +35,27 @@ describe('attendance', () => {
     expect(res.body.occupancy.level).toBe('LOW');
   });
 
+  it('excludes stale (prior-day) open check-ins from occupancy', async () => {
+    const { Attendance } = await import('../models/index.js');
+    const u = await makeUser('MEMBER');
+
+    // simulate a check-in 2 days ago that was never checked out
+    const twoDaysAgo = new Date();
+    twoDaysAgo.setUTCDate(twoDaysAgo.getUTCDate() - 2);
+    await Attendance.create({ user: u.id, checkInAt: twoDaysAgo, checkOutAt: null });
+
+    // occupancy ignores it (it's not from today)
+    const summary = await request(app).get('/api/attendance/summary').set(auth(u.token));
+    expect(summary.body.occupancy.activeCount).toBe(0);
+    expect(summary.body.checkedIn).toBe(false);
+
+    // checking in today auto-closes the stale session and succeeds
+    const res = await request(app).post('/api/attendance/check-in').set(auth(u.token));
+    expect(res.status).toBe(201);
+    const after = await request(app).get('/api/attendance/summary').set(auth(u.token));
+    expect(after.body.occupancy.activeCount).toBe(1);
+  });
+
   it('blocks check-in when the gym is at full capacity', async () => {
     await setCapacity(1);
     const a = await makeUser('MEMBER');
