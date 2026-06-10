@@ -18,6 +18,7 @@ import { getApiErrorMessage } from '../lib/api';
 import { PageHeader } from '../components/ui/page-header';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
+import { Select } from '../components/ui/select';
 import { DataGrid } from '../components/ui/data-grid';
 import { Drawer } from '../components/ui/drawer';
 import { ConfirmDialog } from '../components/ui/confirm-dialog';
@@ -324,6 +325,20 @@ function AdminSlots({ date }: { date: string }) {
   );
 }
 
+// Half-hour time options from 05:00 to 22:00 (e.g. "06:00", "06:30", …).
+const TIME_OPTIONS = (() => {
+  const out: string[] = [];
+  for (let m = 5 * 60; m <= 22 * 60; m += 30) {
+    out.push(`${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`);
+  }
+  return out;
+})();
+
+function nextTime(time: string): string {
+  const i = TIME_OPTIONS.indexOf(time);
+  return TIME_OPTIONS[Math.min(i + 1, TIME_OPTIONS.length - 1)];
+}
+
 function SlotForm({
   initial,
   onSubmit,
@@ -338,6 +353,13 @@ function SlotForm({
     capacity: initial?.capacity ?? 15,
   });
 
+  // End must be after start; bump it if a later start is chosen.
+  function onStartChange(startTime: string) {
+    setV((s) => ({ ...s, startTime, endTime: s.endTime <= startTime ? nextTime(startTime) : s.endTime }));
+  }
+
+  const endOptions = TIME_OPTIONS.filter((tt) => tt > v.startTime);
+
   return (
     <form
       id="slot-form"
@@ -347,30 +369,20 @@ function SlotForm({
       }}
       className="space-y-4"
     >
-      <div>
-        <label htmlFor="slot-start" className={`mb-1 block ${labelClasses}`}>
-          {t('slots.startTime')}
-        </label>
-        <input
-          id="slot-start"
-          type="time"
-          value={v.startTime}
-          onChange={(e) => setV((s) => ({ ...s, startTime: e.target.value }))}
-          className={fieldClasses}
-        />
-      </div>
-      <div>
-        <label htmlFor="slot-end" className={`mb-1 block ${labelClasses}`}>
-          {t('slots.endTime')}
-        </label>
-        <input
-          id="slot-end"
-          type="time"
-          value={v.endTime}
-          onChange={(e) => setV((s) => ({ ...s, endTime: e.target.value }))}
-          className={fieldClasses}
-        />
-      </div>
+      <Select
+        id="slot-start"
+        label={t('slots.startTime')}
+        value={v.startTime}
+        onChange={(e) => onStartChange(e.target.value)}
+        options={TIME_OPTIONS.slice(0, -1).map((tt) => ({ value: tt, label: tt }))}
+      />
+      <Select
+        id="slot-end"
+        label={t('slots.endTime')}
+        value={v.endTime}
+        onChange={(e) => setV((s) => ({ ...s, endTime: e.target.value }))}
+        options={endOptions.map((tt) => ({ value: tt, label: tt }))}
+      />
       <div>
         <label htmlFor="slot-capacity" className={`mb-1 block ${labelClasses}`}>
           {t('slots.capacityLabel')}
