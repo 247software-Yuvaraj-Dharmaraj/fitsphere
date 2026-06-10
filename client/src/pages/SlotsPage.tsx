@@ -303,7 +303,7 @@ function AdminSlots({ date }: { date: string }) {
           </>
         }
       >
-        <SlotForm initial={drawer?.slot} onSubmit={handleSubmit} />
+        <SlotForm initial={drawer?.slot} existing={slots} onSubmit={handleSubmit} />
       </Drawer>
 
       <ConfirmDialog
@@ -328,9 +328,11 @@ const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/; // 24-hour HH:MM (matches the API)
 
 function SlotForm({
   initial,
+  existing = [],
   onSubmit,
 }: {
   initial?: Slot;
+  existing?: Slot[];
   onSubmit: (v: { startTime: string; endTime: string; capacity: number }) => void;
 }) {
   const { t } = useTranslation();
@@ -342,11 +344,20 @@ function SlotForm({
 
   // Free-form time entry with inline validation (any HH:MM, not just half-hours).
   const startErr = TIME_RE.test(v.startTime) ? undefined : t('slots.timeFormat');
+  const timesOk = TIME_RE.test(v.endTime) && v.endTime > v.startTime && !startErr;
+  // Overlap with another slot that day (server enforces this too).
+  const overlaps =
+    timesOk &&
+    existing.some(
+      (s) => s.id !== initial?.id && v.startTime < s.endTime && s.startTime < v.endTime,
+    );
   const endErr = !TIME_RE.test(v.endTime)
     ? t('slots.timeFormat')
     : v.endTime <= v.startTime
       ? t('slots.endAfterStart')
-      : undefined;
+      : overlaps
+        ? t('slots.overlap')
+        : undefined;
   const valid = !startErr && !endErr && v.capacity >= 1;
 
   return (
