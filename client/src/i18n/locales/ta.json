@@ -143,7 +143,6 @@
     "last14days": "கடந்த 14 நாட்கள்",
     "members": "உறுப்பினர்கள்",
     "searchPlaceholder": "உறுப்பினர்களைத் தேடு...",
-    "exportCsv": "CSV ஏற்றுமதி",
     "member": "உறுப்பினர்",
     "visits": "வருகைகள்",
     "thisWeek": "இந்த வாரம்",
@@ -155,7 +154,8 @@
       "ACTIVE": "செயலில்",
       "AT_RISK": "அபாயத்தில்",
       "INACTIVE": "செயலற்ற"
-    }
+    },
+    "exportXlsx": "Excel ஏற்றுமதி"
   },
   "profile": {
     "feedbackFromTrainers": "உங்கள் பயிற்சியாளர்களின் கருத்து",

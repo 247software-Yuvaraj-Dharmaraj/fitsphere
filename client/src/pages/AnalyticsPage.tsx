@@ -16,7 +16,7 @@ import { useAnalyticsOverview, useMembers } from '../features/analytics/analytic
 import { getMembers, type MemberRow, type MemberStatus } from '../features/analytics/analytics.api';
 import { useDebounce } from '../lib/useDebounce';
 import { useChartTooltip } from '../lib/useChartTooltip';
-import { downloadCsv } from '../lib/csv';
+import { downloadXlsx } from '../lib/xlsx';
 import { Button } from '../components/ui/button';
 import { SkeletonCard, SkeletonPanel } from '../components/Skeleton';
 import { PageHeader } from '../components/ui/page-header';
@@ -65,7 +65,7 @@ export function AnalyticsPage() {
   };
 
   const [exporting, setExporting] = useState(false);
-  async function exportCsv() {
+  async function exportXlsx() {
     setExporting(true);
     try {
       const all = await getMembers({
@@ -75,8 +75,9 @@ export function AnalyticsPage() {
         sort: sortState.id as 'name' | 'totalVisits' | 'thisWeek' | 'lastVisit' | 'status',
         dir: sortState.desc ? 'desc' : 'asc',
       });
-      downloadCsv(
-        'fitsphere-members.csv',
+      await downloadXlsx(
+        'fitsphere-members.xlsx',
+        'Members',
         [
           { key: 'name', header: 'Name' },
           { key: 'email', header: 'Email' },
@@ -209,9 +210,9 @@ export function AnalyticsPage() {
                 className={`${fieldClasses} pl-8`}
               />
             </div>
-            <Button variant="secondary" size="sm" onClick={exportCsv} disabled={exporting}>
-              <Download size={14} />
-              {t('analytics.exportCsv')}
+            <Button variant="secondary" size="sm" onClick={exportXlsx} loading={exporting}>
+              {!exporting && <Download size={14} />}
+              {t('analytics.exportXlsx')}
             </Button>
           </div>
         </div>
