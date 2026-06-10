@@ -25,12 +25,15 @@ export async function getOverview(signal?: AbortSignal): Promise<AnalyticsOvervi
   return data;
 }
 
+export type MemberStatusFilter = 'ALL' | MemberStatus;
+
 export interface MembersQuery {
   q: string;
   page: number;
   pageSize: number;
   sort: 'name' | 'totalVisits' | 'thisWeek' | 'lastVisit' | 'status';
   dir: 'asc' | 'desc';
+  status: MemberStatusFilter;
 }
 
 export interface MembersPage {

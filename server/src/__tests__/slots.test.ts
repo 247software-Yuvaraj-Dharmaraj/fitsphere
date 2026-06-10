@@ -233,4 +233,25 @@ describe('analytics', () => {
     expect(search.body.rows[0].email).toBe('bbb@test.app');
     expect(search.body.rows[0].status).toBe('INACTIVE'); // never checked in
   });
+
+  it('members directory can be filtered by status', async () => {
+    const admin = await makeUser('ADMIN');
+    await makeUser('MEMBER', 'aaa@test.app');
+    await makeUser('MEMBER', 'bbb@test.app');
+
+    // members who have never checked in are INACTIVE
+    const inactive = await request(app)
+      .get('/api/analytics/members?status=INACTIVE')
+      .set(auth(admin.token));
+    expect(inactive.status).toBe(200);
+    expect(inactive.body.total).toBe(2);
+    expect(inactive.body.rows.every((r: { status: string }) => r.status === 'INACTIVE')).toBe(true);
+
+    // none are ACTIVE
+    const active = await request(app)
+      .get('/api/analytics/members?status=ACTIVE')
+      .set(auth(admin.token));
+    expect(active.body.total).toBe(0);
+    expect(active.body.rows).toHaveLength(0);
+  });
 });
