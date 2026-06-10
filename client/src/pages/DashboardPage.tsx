@@ -25,6 +25,7 @@ import {
 } from '../features/workouts/workouts.hooks';
 import type { WorkoutType } from '../features/workouts/workouts.api';
 import { getApiErrorMessage } from '../lib/api';
+import { useChartTooltip } from '../lib/useChartTooltip';
 import { PageHeader } from '../components/ui/page-header';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -46,6 +47,7 @@ export function DashboardPage() {
   const stats = useWorkoutStats();
   const recent = useRecentWorkouts(5);
   const bestTime = useBestTime();
+  const tooltip = useChartTooltip();
 
   // 24-hour, locale-neutral (avoids Latin "AM/PM" leaking into non-English UIs).
   const formatHour = (h: number) =>
@@ -118,6 +120,7 @@ export function DashboardPage() {
               <BarChart data={trendData}>
                 <XAxis dataKey="label" tick={tickStyle} interval={1} />
                 <Tooltip
+                  {...tooltip}
                   cursor={{ fill: 'rgba(148,163,184,0.15)' }}
                   formatter={(v) => [Number(v) ? t('dashboard.present') : t('dashboard.absent'), '']}
                 />
@@ -137,7 +140,7 @@ export function DashboardPage() {
                       <Cell key={d.type} fill={TYPE_COLORS[d.type]} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(v, n) => [v, t(`dashboard.types.${String(n)}`)]} />
+                  <Tooltip {...tooltip} formatter={(v, n) => [v, t(`dashboard.types.${String(n)}`)]} />
                 </PieChart>
               </ResponsiveContainer>
             )}

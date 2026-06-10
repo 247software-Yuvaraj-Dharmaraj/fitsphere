@@ -15,6 +15,7 @@ import { Search, Users, Activity, Clock, Gauge, Download, BarChart3 } from 'luci
 import { useAnalyticsOverview, useMembers } from '../features/analytics/analytics.hooks';
 import { getMembers, type MemberRow, type MemberStatus } from '../features/analytics/analytics.api';
 import { useDebounce } from '../lib/useDebounce';
+import { useChartTooltip } from '../lib/useChartTooltip';
 import { downloadCsv } from '../lib/csv';
 import { Button } from '../components/ui/button';
 import { SkeletonCard, SkeletonPanel } from '../components/Skeleton';
@@ -34,6 +35,7 @@ const tickStyle = { fontSize: 11, fill: '#94a3b8' };
 export function AnalyticsPage() {
   const { t, i18n } = useTranslation();
   const overview = useAnalyticsOverview();
+  const tooltip = useChartTooltip();
 
   const PAGE_SIZE = 10;
   const [search, setSearch] = useState('');
@@ -170,7 +172,7 @@ export function AnalyticsPage() {
               <BarChart data={o?.peakHours ?? []}>
                 <XAxis dataKey="hour" tick={tickStyle} interval={2} />
                 <YAxis tick={tickStyle} allowDecimals={false} width={24} />
-                <Tooltip labelFormatter={(h) => `${h}:00`} formatter={(v) => [v, t('analytics.checkIns')]} cursor={{ fill: 'rgba(148,163,184,0.15)' }} />
+                <Tooltip {...tooltip} labelFormatter={(h) => `${h}:00`} formatter={(v) => [v, t('analytics.checkIns')]} cursor={{ fill: 'rgba(148,163,184,0.15)' }} />
                 <Bar dataKey="count" radius={[3, 3, 0, 0]} fill="#f59e0b" />
               </BarChart>
             </ResponsiveContainer>
@@ -181,7 +183,7 @@ export function AnalyticsPage() {
               <AreaChart data={trendData}>
                 <XAxis dataKey="label" tick={tickStyle} interval={1} />
                 <YAxis tick={tickStyle} allowDecimals={false} width={24} />
-                <Tooltip formatter={(v) => [v, t('analytics.checkIns')]} />
+                <Tooltip {...tooltip} formatter={(v) => [v, t('analytics.checkIns')]} />
                 <Area type="monotone" dataKey="count" stroke="#16a34a" fill="#16a34a" fillOpacity={0.15} />
               </AreaChart>
             </ResponsiveContainer>
