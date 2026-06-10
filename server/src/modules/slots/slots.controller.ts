@@ -7,6 +7,10 @@ export async function list(req: Request, res: Response) {
   res.json(await service.listByDate(req.user!.id, date));
 }
 
+export async function myBookings(req: Request, res: Response) {
+  res.json(await service.myBookings(req.user!.id));
+}
+
 export async function book(req: Request, res: Response) {
   res.json(await service.book(req.params.id, req.user!.id));
 }

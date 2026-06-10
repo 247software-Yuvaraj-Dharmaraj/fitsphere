@@ -9,6 +9,7 @@ import {
   User as UserIcon,
   LogOut,
   Dumbbell,
+  Bookmark,
 } from 'lucide-react';
 import type { ComponentType } from 'react';
 import { useAuth } from '../features/auth/useAuth';
@@ -31,6 +32,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/dashboard', labelKey: 'nav.dashboard', icon: LayoutDashboard },
   { to: '/attendance', labelKey: 'nav.attendance', icon: CalendarCheck },
   { to: '/slots', labelKey: 'nav.slots', icon: CalendarClock },
+  { to: '/bookings', labelKey: 'nav.bookings', icon: Bookmark, roles: ['MEMBER'] },
   { to: '/analytics', labelKey: 'nav.analytics', icon: BarChart3, roles: ['TRAINER', 'ADMIN'] },
   { to: '/profile', labelKey: 'nav.profile', icon: UserIcon },
 ];

@@ -8,7 +8,8 @@
     "attendance": "Attendance",
     "slots": "Slots",
     "analytics": "Analytics",
-    "profile": "Profile"
+    "profile": "Profile",
+    "bookings": "My Bookings"
   },
   "auth": {
     "signIn": "Sign In",
@@ -187,6 +188,13 @@
     "profile": {
       "title": "Profile",
       "subtitle": "Manage your account."
+    },
+    "bookings": {
+      "title": "My Bookings",
+      "subtitle": "Your upcoming workout slots."
     }
+  },
+  "bookings": {
+    "empty": "No upcoming bookings. Book a slot from the Slots page."
   }
 }

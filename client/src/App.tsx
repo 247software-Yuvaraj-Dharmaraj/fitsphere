@@ -22,6 +22,9 @@ const AttendancePage = lazy(() =>
   import('./pages/AttendancePage').then((m) => ({ default: m.AttendancePage })),
 );
 const SlotsPage = lazy(() => import('./pages/SlotsPage').then((m) => ({ default: m.SlotsPage })));
+const BookingsPage = lazy(() =>
+  import('./pages/BookingsPage').then((m) => ({ default: m.BookingsPage })),
+);
 const AnalyticsPage = lazy(() =>
   import('./pages/AnalyticsPage').then((m) => ({ default: m.AnalyticsPage })),
 );
@@ -49,6 +52,7 @@ export default function App() {
                       <Route path="/dashboard" element={<DashboardPage />} />
                       <Route path="/attendance" element={<AttendancePage />} />
                       <Route path="/slots" element={<SlotsPage />} />
+                      <Route path="/bookings" element={<BookingsPage />} />
                       <Route path="/profile" element={<ProfilePage />} />
 
                       {/* Trainer/Admin only */}

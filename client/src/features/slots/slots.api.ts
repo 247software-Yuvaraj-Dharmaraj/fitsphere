@@ -28,6 +28,11 @@ export async function getSlots(date: string, signal?: AbortSignal): Promise<Slot
   return data;
 }
 
+export async function getMyBookings(signal?: AbortSignal): Promise<Slot[]> {
+  const { data } = await api.get<Slot[]>('/slots/my-bookings', { signal });
+  return data;
+}
+
 export async function bookSlot(id: string): Promise<void> {
   await api.post(`/slots/${id}/book`);
 }

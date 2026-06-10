@@ -71,6 +71,17 @@ export async function listByDate(userId: string, date?: string) {
   return { date: target, slots: slots.map((s) => toDto(s, userId)) };
 }
 
+// A member's own upcoming booked slots (today onward), across all days.
+export async function myBookings(userId: string) {
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+  const uid = new Types.ObjectId(userId);
+  const slots = await Slot.find({ bookings: uid, date: { $gte: today } })
+    .sort({ date: 1, startTime: 1 })
+    .lean<SlotDoc[]>();
+  return slots.map((s) => toDto(s, userId));
+}
+
 export async function book(slotId: string, userId: string) {
   if (!Types.ObjectId.isValid(slotId)) throw new HttpError(404, 'Slot not found');
   const slot = await Slot.findById(slotId);
