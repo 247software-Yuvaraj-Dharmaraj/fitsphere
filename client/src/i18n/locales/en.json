@@ -72,7 +72,8 @@
       "MEDIUM": "Medium",
       "HIGH": "High",
       "FULL": "Full"
-    }
+    },
+    "daysThisMonth": "{{count}} days attended this month"
   },
   "slots": {
     "book": "Book",

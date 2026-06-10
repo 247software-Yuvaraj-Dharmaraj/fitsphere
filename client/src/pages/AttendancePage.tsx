@@ -124,27 +124,41 @@ export function AttendancePage() {
         <StatCard label={t('attendance.allTime')} value={s ? String(s.totals.allTime) : '—'} />
       </section>
 
-      {/* Milestones */}
-      {s && (
-        <section className="flex flex-wrap gap-2">
-          {([3, 7, 14] as const).map((m) => (
-            <Badge key={m} tone={s.milestones[m] ? 'green' : 'slate'}>
-              {s.milestones[m] ? '🔥 ' : ''}
-              {t('attendance.dayStreak', { count: m })}
-            </Badge>
-          ))}
-        </section>
-      )}
-
-      {/* Calendar */}
-      <AttendanceCalendar
-        year={view.year}
-        month={view.month}
-        attendedDays={attendedDays}
-        onPrev={() => shiftMonth(-1)}
-        onNext={() => shiftMonth(1)}
-        loading={monthQuery.isFetching}
-      />
+      {/* Calendar (compact) + recap */}
+      <section className="grid gap-6 lg:grid-cols-[20rem_1fr]">
+        <AttendanceCalendar
+          year={view.year}
+          month={view.month}
+          attendedDays={attendedDays}
+          onPrev={() => shiftMonth(-1)}
+          onNext={() => shiftMonth(1)}
+          loading={monthQuery.isFetching}
+        />
+        {s && (
+          <Card className="flex flex-col gap-4 p-5">
+            <div>
+              <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                {t('attendance.streak')}
+              </h2>
+              <p className="mt-1 text-3xl font-bold text-slate-800 dark:text-slate-100">
+                {s.streak}{' '}
+                <span className="text-base font-medium text-slate-400">{t('attendance.days')}</span>
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {([3, 7, 14] as const).map((m) => (
+                <Badge key={m} tone={s.milestones[m] ? 'green' : 'slate'}>
+                  {s.milestones[m] ? '🔥 ' : ''}
+                  {t('attendance.dayStreak', { count: m })}
+                </Badge>
+              ))}
+            </div>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              {t('attendance.daysThisMonth', { count: attendedDays.size })}
+            </p>
+          </Card>
+        )}
+      </section>
     </div>
   );
 }
