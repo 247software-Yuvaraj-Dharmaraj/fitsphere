@@ -181,6 +181,97 @@ describe('slots', () => {
     expect(tooLow.status).toBe(409);
   });
 
+  it('waitlists a member on a full slot and auto-promotes them on cancellation', async () => {
+    const admin = await makeUser('ADMIN');
+    await createSlot(admin.token, 1); // capacity 1
+    const list = await request(app).get(`/api/slots?date=${TODAY}`).set(auth(admin.token));
+    const slotId = list.body.slots[0].id;
+
+    const m1 = await makeUser('MEMBER');
+    const m2 = await makeUser('MEMBER');
+
+    // m1 takes the only seat
+    await request(app).post(`/api/slots/${slotId}/book`).set(auth(m1.token));
+
+    // m2 can't book a full slot, but can join the waitlist
+    const cantBook = await request(app).post(`/api/slots/${slotId}/book`).set(auth(m2.token));
+    expect(cantBook.status).toBe(409);
+
+    const joined = await request(app).post(`/api/slots/${slotId}/waitlist`).set(auth(m2.token));
+    expect(joined.status).toBe(200);
+    expect(joined.body.waitlistedByMe).toBe(true);
+    expect(joined.body.waitlistPosition).toBe(1);
+
+    // can't join twice
+    const dup = await request(app).post(`/api/slots/${slotId}/waitlist`).set(auth(m2.token));
+    expect(dup.status).toBe(409);
+
+    // m1 cancels → m2 is auto-promoted into the seat
+    await request(app).delete(`/api/slots/${slotId}/book`).set(auth(m1.token));
+
+    const after = await request(app).get('/api/slots/my-bookings').set(auth(m2.token));
+    expect(after.body).toHaveLength(1);
+    expect(after.body[0].bookedByMe).toBe(true);
+    expect(after.body[0].waitlistedByMe).toBe(false);
+  });
+
+  it('rejects joining the waitlist when the slot still has space', async () => {
+    const admin = await makeUser('ADMIN');
+    await createSlot(admin.token, 5); // plenty of room
+    const list = await request(app).get(`/api/slots?date=${TODAY}`).set(auth(admin.token));
+    const slotId = list.body.slots[0].id;
+
+    const member = await makeUser('MEMBER');
+    const res = await request(app).post(`/api/slots/${slotId}/waitlist`).set(auth(member.token));
+    expect(res.status).toBe(409);
+  });
+
+  it('lets a member leave the waitlist', async () => {
+    const admin = await makeUser('ADMIN');
+    await createSlot(admin.token, 1);
+    const list = await request(app).get(`/api/slots?date=${TODAY}`).set(auth(admin.token));
+    const slotId = list.body.slots[0].id;
+
+    const m1 = await makeUser('MEMBER');
+    const m2 = await makeUser('MEMBER');
+    await request(app).post(`/api/slots/${slotId}/book`).set(auth(m1.token));
+    await request(app).post(`/api/slots/${slotId}/waitlist`).set(auth(m2.token));
+
+    const left = await request(app).delete(`/api/slots/${slotId}/waitlist`).set(auth(m2.token));
+    expect(left.status).toBe(200);
+    expect(left.body.waitlistCount).toBe(0);
+
+    // leaving when not on the waitlist is a 400
+    const again = await request(app).delete(`/api/slots/${slotId}/waitlist`).set(auth(m2.token));
+    expect(again.status).toBe(400);
+
+    // m1 cancels — nobody to promote, seat just frees
+    await request(app).delete(`/api/slots/${slotId}/book`).set(auth(m1.token));
+    const fresh = await request(app).get(`/api/slots?date=${TODAY}`).set(auth(admin.token));
+    expect(fresh.body.slots[0].bookedCount).toBe(0);
+  });
+
+  it('promotes from the waitlist when capacity is increased', async () => {
+    const admin = await makeUser('ADMIN');
+    await createSlot(admin.token, 1);
+    const list = await request(app).get(`/api/slots?date=${TODAY}`).set(auth(admin.token));
+    const slotId = list.body.slots[0].id;
+
+    const m1 = await makeUser('MEMBER');
+    const m2 = await makeUser('MEMBER');
+    await request(app).post(`/api/slots/${slotId}/book`).set(auth(m1.token));
+    await request(app).post(`/api/slots/${slotId}/waitlist`).set(auth(m2.token));
+
+    // admin raises capacity to 2 → m2 should be pulled in
+    const edited = await request(app)
+      .patch(`/api/slots/${slotId}`)
+      .set(auth(admin.token))
+      .send({ startTime: '06:00', endTime: '07:00', capacity: 2 });
+    expect(edited.status).toBe(200);
+    expect(edited.body.bookedCount).toBe(2);
+    expect(edited.body.waitlistCount).toBe(0);
+  });
+
   it('admin can bulk-delete slots', async () => {
     const admin = await makeUser('ADMIN');
     await createSlot(admin.token);

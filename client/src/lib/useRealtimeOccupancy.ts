@@ -22,9 +22,18 @@ export function useRealtimeOccupancy() {
       );
     };
 
+    // Bookings/waitlists changed somewhere — refetch the slot views so a freed
+    // seat or a waitlist promotion shows up live (e.g. you get promoted while
+    // looking at My Bookings).
+    const onSlotsChanged = () => {
+      qc.invalidateQueries({ queryKey: ['slots'] });
+    };
+
     socket.on('occupancy', onOccupancy);
+    socket.on('slots:changed', onSlotsChanged);
     return () => {
       socket.off('occupancy', onOccupancy);
+      socket.off('slots:changed', onSlotsChanged);
       socket.disconnect();
     };
   }, [qc]);

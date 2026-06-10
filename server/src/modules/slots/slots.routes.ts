@@ -11,6 +11,8 @@ router.get('/', asyncHandler(controller.list));
 router.get('/my-bookings', asyncHandler(controller.myBookings));
 router.post('/:id/book', asyncHandler(controller.book));
 router.delete('/:id/book', asyncHandler(controller.cancel));
+router.post('/:id/waitlist', asyncHandler(controller.joinWaitlist));
+router.delete('/:id/waitlist', asyncHandler(controller.leaveWaitlist));
 
 // Slot configuration is Admin/Trainer only (mirrors the product roles).
 router.post('/', requireRole('ADMIN', 'TRAINER'), asyncHandler(controller.create));

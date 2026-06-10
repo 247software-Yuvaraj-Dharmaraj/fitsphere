@@ -9,6 +9,10 @@ export interface Slot {
   bookedCount: number;
   available: number;
   bookedByMe: boolean;
+  isFull: boolean;
+  waitlistCount: number;
+  waitlistedByMe: boolean;
+  waitlistPosition: number | null;
 }
 
 export interface SlotsResponse {
@@ -39,6 +43,14 @@ export async function bookSlot(id: string): Promise<void> {
 
 export async function cancelBooking(id: string): Promise<void> {
   await api.delete(`/slots/${id}/book`);
+}
+
+export async function joinWaitlist(id: string): Promise<void> {
+  await api.post(`/slots/${id}/waitlist`);
+}
+
+export async function leaveWaitlist(id: string): Promise<void> {
+  await api.delete(`/slots/${id}/waitlist`);
 }
 
 export async function createSlot(input: CreateSlotInput): Promise<void> {

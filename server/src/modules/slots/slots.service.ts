@@ -1,6 +1,7 @@
 import { Types } from 'mongoose';
 import { Slot } from '../../models/index.js';
 import { HttpError } from '../../middleware/error.js';
+import { emitSlotsChanged } from '../../lib/realtime.js';
 import type { CreateSlotInput, UpdateSlotInput } from './slots.schema.js';
 
 function dayRange(date: string) {
@@ -45,10 +46,13 @@ interface SlotDoc {
   endTime: string;
   capacity: number;
   bookings: Types.ObjectId[];
+  waitlist?: Types.ObjectId[];
 }
 
 function toDto(slot: SlotDoc, userId: string) {
   const bookedCount = slot.bookings.length;
+  const waitlist = slot.waitlist ?? [];
+  const waitlistIndex = waitlist.findIndex((w) => String(w) === userId);
   return {
     id: String(slot._id),
     date: slot.date,
@@ -58,6 +62,11 @@ function toDto(slot: SlotDoc, userId: string) {
     bookedCount,
     available: Math.max(0, slot.capacity - bookedCount),
     bookedByMe: slot.bookings.some((b) => String(b) === userId),
+    isFull: bookedCount >= slot.capacity,
+    waitlistCount: waitlist.length,
+    waitlistedByMe: waitlistIndex !== -1,
+    // 1-based position in the queue (null when not waitlisted).
+    waitlistPosition: waitlistIndex === -1 ? null : waitlistIndex + 1,
   };
 }
 
@@ -71,12 +80,16 @@ export async function listByDate(userId: string, date?: string) {
   return { date: target, slots: slots.map((s) => toDto(s, userId)) };
 }
 
-// A member's own upcoming booked slots (today onward), across all days.
+// A member's own upcoming slots (today onward), across all days — both confirmed
+// bookings and waitlist entries (the DTO flags which is which).
 export async function myBookings(userId: string) {
   const today = new Date();
   today.setUTCHours(0, 0, 0, 0);
   const uid = new Types.ObjectId(userId);
-  const slots = await Slot.find({ bookings: uid, date: { $gte: today } })
+  const slots = await Slot.find({
+    date: { $gte: today },
+    $or: [{ bookings: uid }, { waitlist: uid }],
+  })
     .sort({ date: 1, startTime: 1 })
     .lean<SlotDoc[]>();
   return slots.map((s) => toDto(s, userId));
@@ -104,7 +117,7 @@ export async function book(slotId: string, userId: string) {
   const uid = new Types.ObjectId(userId);
   const updated = await Slot.findOneAndUpdate(
     { _id: slot._id, bookings: { $ne: uid }, $expr: { $lt: [{ $size: '$bookings' }, '$capacity'] } },
-    { $push: { bookings: uid } },
+    { $push: { bookings: uid }, $pull: { waitlist: uid } },
     { new: true },
   );
   if (!updated) {
@@ -115,7 +128,22 @@ export async function book(slotId: string, userId: string) {
     }
     throw new HttpError(409, 'This slot is fully booked');
   }
+  emitSlotsChanged();
   return toDto(updated.toObject() as SlotDoc, userId);
+}
+
+// Promotes waitlisted members into freed seats (FIFO), mutating the doc in
+// place. Returns true if anyone was promoted.
+function promoteFromWaitlist(slot: { bookings: Types.ObjectId[]; waitlist: Types.ObjectId[]; capacity: number }) {
+  let promoted = false;
+  while (slot.bookings.length < slot.capacity && slot.waitlist.length > 0) {
+    const next = slot.waitlist.shift();
+    if (next) {
+      slot.bookings.push(next);
+      promoted = true;
+    }
+  }
+  return promoted;
 }
 
 export async function cancel(slotId: string, userId: string) {
@@ -125,10 +153,65 @@ export async function cancel(slotId: string, userId: string) {
 
   const before = slot.bookings.length;
   slot.bookings = slot.bookings.filter((b) => String(b) !== userId);
-  if (slot.bookings.length === before) {
+  const wasBooked = slot.bookings.length !== before;
+
+  // Leaving the waitlist is also a valid "cancel" for a member who hadn't been
+  // confirmed yet.
+  const waitBefore = slot.waitlist.length;
+  slot.waitlist = slot.waitlist.filter((w) => String(w) !== userId);
+  const wasWaitlisted = slot.waitlist.length !== waitBefore;
+
+  if (!wasBooked && !wasWaitlisted) {
     throw new HttpError(400, 'You have not booked this slot');
   }
+
+  // A confirmed seat opened up — pull the next person off the waitlist.
+  if (wasBooked) promoteFromWaitlist(slot);
+
   await slot.save();
+  emitSlotsChanged();
+  return toDto(slot.toObject() as SlotDoc, userId);
+}
+
+// Join the waitlist for a full slot. Rejects if the slot has free capacity
+// (the member should just book), or they're already booked / waitlisted.
+export async function joinWaitlist(slotId: string, userId: string) {
+  if (!Types.ObjectId.isValid(slotId)) throw new HttpError(404, 'Slot not found');
+  const slot = await Slot.findById(slotId);
+  if (!slot) throw new HttpError(404, 'Slot not found');
+
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+  if (slot.date < today) throw new HttpError(409, 'This slot has already passed');
+
+  if (slot.bookings.some((b) => String(b) === userId)) {
+    throw new HttpError(409, 'You have already booked this slot');
+  }
+  if (slot.bookings.length < slot.capacity) {
+    throw new HttpError(409, 'This slot still has space — book it directly');
+  }
+  if (slot.waitlist.some((w) => String(w) === userId)) {
+    throw new HttpError(409, 'You are already on the waitlist');
+  }
+
+  slot.waitlist.push(new Types.ObjectId(userId));
+  await slot.save();
+  emitSlotsChanged();
+  return toDto(slot.toObject() as SlotDoc, userId);
+}
+
+export async function leaveWaitlist(slotId: string, userId: string) {
+  if (!Types.ObjectId.isValid(slotId)) throw new HttpError(404, 'Slot not found');
+  const slot = await Slot.findById(slotId);
+  if (!slot) throw new HttpError(404, 'Slot not found');
+
+  const before = slot.waitlist.length;
+  slot.waitlist = slot.waitlist.filter((w) => String(w) !== userId);
+  if (slot.waitlist.length === before) {
+    throw new HttpError(400, 'You are not on the waitlist');
+  }
+  await slot.save();
+  emitSlotsChanged();
   return toDto(slot.toObject() as SlotDoc, userId);
 }
 
@@ -165,7 +248,10 @@ export async function update(slotId: string, input: UpdateSlotInput) {
   slot.startTime = input.startTime;
   slot.endTime = input.endTime;
   slot.capacity = input.capacity;
+  // Raising capacity opens seats — fill them from the waitlist (FIFO).
+  promoteFromWaitlist(slot);
   await slot.save();
+  emitSlotsChanged();
   return toDto(slot.toObject() as SlotDoc, '');
 }
 

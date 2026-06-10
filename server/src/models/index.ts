@@ -91,6 +91,9 @@ const slotSchema = new Schema({
   endTime: { type: String, required: true }, // "07:00"
   capacity: { type: Number, required: true, min: 1 },
   bookings: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  // FIFO queue of members waiting for a seat once the slot is full. The head is
+  // auto-promoted into `bookings` when a booking is cancelled or capacity grows.
+  waitlist: [{ type: Schema.Types.ObjectId, ref: 'User' }],
 });
 
 export const Slot = model('Slot', slotSchema);

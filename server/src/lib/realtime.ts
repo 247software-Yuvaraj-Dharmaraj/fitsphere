@@ -20,3 +20,9 @@ export function initRealtime(httpServer: HttpServer): Server {
 export function emitOccupancy(snapshot: unknown): void {
   io?.emit('occupancy', snapshot);
 }
+
+// Signals that slot bookings/waitlists changed so clients can refetch. Broadcast
+// (no per-user payload) — clients just re-pull their own slot views.
+export function emitSlotsChanged(): void {
+  io?.emit('slots:changed');
+}
