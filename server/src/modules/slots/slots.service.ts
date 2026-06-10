@@ -76,6 +76,13 @@ export async function book(slotId: string, userId: string) {
   const slot = await Slot.findById(slotId);
   if (!slot) throw new HttpError(404, 'Slot not found');
 
+  // Can't book a slot on a day that's already past.
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+  if (slot.date < today) {
+    throw new HttpError(409, 'This slot has already passed');
+  }
+
   if (slot.bookings.some((b) => String(b) === userId)) {
     throw new HttpError(409, 'You have already booked this slot');
   }
