@@ -48,6 +48,37 @@ describe('slots', () => {
     expect(cancelled.body.bookedByMe).toBe(false);
   });
 
+  it('does not overbook the last seat under concurrent bookings', async () => {
+    const admin = await makeUser('ADMIN');
+    await createSlot(admin.token, 1); // capacity 1
+    const list = await request(app).get(`/api/slots?date=${TODAY}`).set(auth(admin.token));
+    const slotId = list.body.slots[0].id;
+
+    const a = await makeUser('MEMBER');
+    const b = await makeUser('MEMBER');
+    // both race for the single seat at the same time
+    const [r1, r2] = await Promise.all([
+      request(app).post(`/api/slots/${slotId}/book`).set(auth(a.token)),
+      request(app).post(`/api/slots/${slotId}/book`).set(auth(b.token)),
+    ]);
+    const statuses = [r1.status, r2.status].sort();
+    expect(statuses).toEqual([200, 409]); // exactly one wins
+
+    const after = await request(app).get(`/api/slots?date=${TODAY}`).set(auth(admin.token));
+    expect(after.body.slots[0].bookedCount).toBe(1); // never exceeds capacity
+  });
+
+  it('rejects creating a slot in the past', async () => {
+    const admin = await makeUser('ADMIN');
+    const yesterday = new Date();
+    yesterday.setUTCDate(yesterday.getUTCDate() - 1);
+    const res = await request(app)
+      .post('/api/slots')
+      .set(auth(admin.token))
+      .send({ date: yesterday.toISOString().slice(0, 10), startTime: '06:00', endTime: '07:00', capacity: 5 });
+    expect(res.status).toBe(409);
+  });
+
   it('admin can edit a slot; members cannot', async () => {
     const admin = await makeUser('ADMIN');
     await createSlot(admin.token, 5);
