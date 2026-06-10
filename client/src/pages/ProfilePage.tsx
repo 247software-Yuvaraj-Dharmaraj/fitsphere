@@ -24,7 +24,7 @@ export function ProfilePage() {
   const isStaff = user?.role === 'ADMIN' || user?.role === 'TRAINER';
 
   return (
-    <div className="mx-auto max-w-2xl">
+    <div className="mx-auto max-w-3xl">
       <PageHeader
         icon={<UserCircle size={24} />}
         title={t('pages.profile.title')}

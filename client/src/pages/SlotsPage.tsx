@@ -47,7 +47,7 @@ export function SlotsPage() {
   }).format(new Date(`${date}T00:00:00Z`));
 
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="mx-auto max-w-5xl">
       <PageHeader
         icon={<CalendarClock size={24} />}
         title={t('pages.slots.title')}
