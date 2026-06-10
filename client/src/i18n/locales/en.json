@@ -98,7 +98,10 @@
     "available": "Available",
     "deleteConfirmTitle": "Delete slot(s)?",
     "deleteConfirmSingle": "This will permanently delete the slot and its bookings.",
-    "deleteConfirmMass": "This will permanently delete {{count}} slot(s) and their bookings."
+    "deleteConfirmMass": "This will permanently delete {{count}} slot(s) and their bookings.",
+    "timeFormat": "Use 24-hour HH:MM (e.g. 18:30)",
+    "endAfterStart": "End must be after start",
+    "timePlaceholder": "HH:MM"
   },
   "dashboard": {
     "consistency": "Consistency",
