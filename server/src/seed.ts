@@ -47,6 +47,21 @@ async function main() {
   await Slot.insertMany(slots);
   console.log('[seed] created %d slots across 3 days', slots.length);
 
+  // A popular, fully-booked slot today with Alice on the waitlist, so reviewers
+  // can see the waitlist feature the moment they log in as the demo member.
+  if (member && trainer) {
+    const todayUtc = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
+    await Slot.create({
+      date: todayUtc,
+      startTime: '17:00',
+      endTime: '18:00',
+      capacity: 1,
+      bookings: [trainer._id],
+      waitlist: [member._id],
+    });
+    console.log('[seed] added a full slot with a demo waitlist entry');
+  }
+
   // One demo feedback so the member's timeline isn't empty.
   if (member && trainer) {
     const weekOf = new Date();

@@ -9,6 +9,8 @@ import {
   useCancelBooking,
   useCreateSlot,
   useDeleteSlot,
+  useJoinWaitlist,
+  useLeaveWaitlist,
   useSlots,
   useUpdateSlot,
 } from '../features/slots/slots.hooks';
@@ -24,6 +26,7 @@ import { Drawer } from '../components/ui/drawer';
 import { ConfirmDialog } from '../components/ui/confirm-dialog';
 import { SelectionBar } from '../components/ui/selection-bar';
 import { Tooltip } from '../components/ui/tooltip';
+import { Badge } from '../components/ui/badge';
 
 function todayKey() {
   return new Date().toISOString().slice(0, 10);
@@ -83,6 +86,8 @@ function MemberBooking({ date }: { date: string }) {
   const { data, isLoading } = useSlots(date);
   const book = useBookSlot(date);
   const cancel = useCancelBooking(date);
+  const joinWaitlist = useJoinWaitlist(date);
+  const leaveWaitlist = useLeaveWaitlist(date);
 
   if (isLoading) return <p className="text-slate-400 dark:text-slate-500">{t('common.loading')}</p>;
   if (!data || data.slots.length === 0)
@@ -92,22 +97,31 @@ function MemberBooking({ date }: { date: string }) {
       </div>
     );
 
-  const busy = book.isPending || cancel.isPending;
+  const busy =
+    book.isPending || cancel.isPending || joinWaitlist.isPending || leaveWaitlist.isPending;
   return (
     <ul className="space-y-3">
       {data.slots.map((slot) => {
         const pct = Math.min(100, Math.round((slot.bookedCount / slot.capacity) * 100));
-        const isFull = slot.available === 0 && !slot.bookedByMe;
         return (
           <Card key={slot.id} className="p-4">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="font-semibold text-slate-800 dark:text-slate-100">
+                <p className="flex items-center gap-2 font-semibold text-slate-800 dark:text-slate-100">
                   {slot.startTime} – {slot.endTime}
+                  {slot.bookedByMe && <Badge tone="green">{t('slots.booked')}</Badge>}
+                  {slot.waitlistedByMe && (
+                    <Badge tone="amber">
+                      {t('slots.waitlistPosition', { position: slot.waitlistPosition })}
+                    </Badge>
+                  )}
                 </p>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
                   {t('slots.spotsLeft', { count: slot.available })} · {slot.bookedCount}/
                   {slot.capacity}
+                  {slot.waitlistCount > 0 && (
+                    <> · {t('slots.waiting', { count: slot.waitlistCount })}</>
+                  )}
                 </p>
               </div>
               {slot.bookedByMe ? (
@@ -123,9 +137,35 @@ function MemberBooking({ date }: { date: string }) {
                 >
                   {t('slots.cancel')}
                 </Button>
+              ) : slot.waitlistedByMe ? (
+                <Button
+                  variant="secondary"
+                  disabled={busy}
+                  onClick={() =>
+                    leaveWaitlist.mutate(slot.id, {
+                      onError: (e) => toast.error(getApiErrorMessage(e, 'Could not leave waitlist')),
+                      onSuccess: () => toast.success(t('slots.leftWaitlistToast')),
+                    })
+                  }
+                >
+                  {t('slots.leaveWaitlist')}
+                </Button>
+              ) : slot.isFull ? (
+                <Button
+                  variant="secondary"
+                  disabled={busy}
+                  onClick={() =>
+                    joinWaitlist.mutate(slot.id, {
+                      onError: (e) => toast.error(getApiErrorMessage(e, 'Could not join waitlist')),
+                      onSuccess: () => toast.success(t('slots.joinedWaitlistToast')),
+                    })
+                  }
+                >
+                  {t('slots.joinWaitlist')}
+                </Button>
               ) : (
                 <Button
-                  disabled={busy || isFull}
+                  disabled={busy}
                   onClick={() =>
                     book.mutate(slot.id, {
                       onError: (e) => toast.error(getApiErrorMessage(e, 'Booking failed')),
@@ -133,7 +173,7 @@ function MemberBooking({ date }: { date: string }) {
                     })
                   }
                 >
-                  {isFull ? t('slots.full') : t('slots.book')}
+                  {t('slots.book')}
                 </Button>
               )}
             </div>

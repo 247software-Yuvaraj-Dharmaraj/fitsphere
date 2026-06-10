@@ -107,7 +107,13 @@
     "timeFormat": "Use 24-hour HH:MM (e.g. 18:30)",
     "endAfterStart": "End must be after start",
     "timePlaceholder": "HH:MM",
-    "overlap": "Overlaps an existing slot that day"
+    "overlap": "Overlaps an existing slot that day",
+    "joinWaitlist": "Join waitlist",
+    "leaveWaitlist": "Leave waitlist",
+    "waitlistPosition": "Waitlist #{{position}}",
+    "waiting": "{{count}} waiting",
+    "joinedWaitlistToast": "Added to the waitlist. We'll book you in if a spot opens up.",
+    "leftWaitlistToast": "Removed from the waitlist."
   },
   "dashboard": {
     "consistency": "Consistency",

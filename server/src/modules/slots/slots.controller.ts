@@ -19,6 +19,14 @@ export async function cancel(req: Request, res: Response) {
   res.json(await service.cancel(req.params.id, req.user!.id));
 }
 
+export async function joinWaitlist(req: Request, res: Response) {
+  res.json(await service.joinWaitlist(req.params.id, req.user!.id));
+}
+
+export async function leaveWaitlist(req: Request, res: Response) {
+  res.json(await service.leaveWaitlist(req.params.id, req.user!.id));
+}
+
 export async function create(req: Request, res: Response) {
   const input = createSlotSchema.parse(req.body);
   res.status(201).json(await service.create(input));

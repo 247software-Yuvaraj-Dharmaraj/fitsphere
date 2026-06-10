@@ -87,6 +87,33 @@ export function useCancelBooking(date: string) {
   });
 }
 
+// Waitlist join/leave invalidate the whole slots tree (positions and counts can
+// shift for everyone). Kept simple — no optimistic patch.
+export function useJoinWaitlist(date: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (slotId: string) => api.joinWaitlist(slotId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: slotsKeys.byDate(date) }),
+  });
+}
+
+export function useLeaveWaitlist(date: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (slotId: string) => api.leaveWaitlist(slotId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: slotsKeys.byDate(date) }),
+  });
+}
+
+// Leave the waitlist from the My Bookings view — invalidates all slot queries.
+export function useLeaveWaitlistMine() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (slotId: string) => api.leaveWaitlist(slotId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['slots'] }),
+  });
+}
+
 export function useCreateSlot(date: string) {
   const qc = useQueryClient();
   return useMutation({
