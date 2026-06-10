@@ -76,11 +76,26 @@ body {
 .fs-drawer {
   animation: fs-slide-in-right 0.2s ease-out;
 }
+@keyframes fs-logo-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.12);
+    opacity: 0.7;
+  }
+}
+.fs-logo-pulse {
+  animation: fs-logo-pulse 1.4s ease-in-out infinite;
+}
 
 @media (prefers-reduced-motion: reduce) {
   .fs-overlay,
   .fs-dialog,
-  .fs-drawer {
+  .fs-drawer,
+  .fs-logo-pulse {
     animation: none;
   }
 }
