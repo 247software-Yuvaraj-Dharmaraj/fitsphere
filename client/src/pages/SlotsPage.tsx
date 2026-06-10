@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import type { ColumnDef, RowSelectionState } from '@tanstack/react-table';
@@ -158,6 +158,7 @@ function AdminSlots({ date }: { date: string }) {
 
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [drawer, setDrawer] = useState<{ mode: 'create' | 'edit'; slot?: Slot } | null>(null);
+  const [formDirty, setFormDirty] = useState(false);
   const [confirm, setConfirm] = useState<{ kind: 'single'; slot: Slot } | { kind: 'mass' } | null>(
     null,
   );
@@ -290,11 +291,21 @@ function AdminSlots({ date }: { date: string }) {
 
       <Drawer
         open={!!drawer}
+        dirty={formDirty}
         title={drawer?.mode === 'edit' ? t('slots.editSlot') : t('slots.newSlot')}
-        onClose={() => setDrawer(null)}
+        onClose={() => {
+          setDrawer(null);
+          setFormDirty(false);
+        }}
         footer={
           <>
-            <Button variant="secondary" onClick={() => setDrawer(null)}>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setDrawer(null);
+                setFormDirty(false);
+              }}
+            >
               {t('common.cancel')}
             </Button>
             <Button type="submit" form="slot-form" loading={saving}>
@@ -303,7 +314,12 @@ function AdminSlots({ date }: { date: string }) {
           </>
         }
       >
-        <SlotForm initial={drawer?.slot} existing={slots} onSubmit={handleSubmit} />
+        <SlotForm
+          initial={drawer?.slot}
+          existing={slots}
+          onSubmit={handleSubmit}
+          onDirtyChange={setFormDirty}
+        />
       </Drawer>
 
       <ConfirmDialog
@@ -330,17 +346,30 @@ function SlotForm({
   initial,
   existing = [],
   onSubmit,
+  onDirtyChange,
 }: {
   initial?: Slot;
   existing?: Slot[];
   onSubmit: (v: { startTime: string; endTime: string; capacity: number }) => void;
+  onDirtyChange?: (dirty: boolean) => void;
 }) {
   const { t } = useTranslation();
-  const [v, setV] = useState({
+  const defaults = {
     startTime: initial?.startTime ?? '06:00',
     endTime: initial?.endTime ?? '07:00',
     capacity: initial?.capacity ?? 15,
-  });
+  };
+  const [v, setV] = useState(defaults);
+
+  // Report unsaved edits to the parent so the drawer can guard accidental closes.
+  useEffect(() => {
+    const dirty =
+      v.startTime !== defaults.startTime ||
+      v.endTime !== defaults.endTime ||
+      v.capacity !== defaults.capacity;
+    onDirtyChange?.(dirty);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [v]);
 
   // Free-form time entry with inline validation (any HH:MM, not just half-hours).
   const startErr = TIME_RE.test(v.startTime) ? undefined : t('slots.timeFormat');

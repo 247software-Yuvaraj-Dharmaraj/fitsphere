@@ -51,7 +51,10 @@
     "lightMode": "Light mode",
     "compact": "Compact",
     "comfortable": "Comfortable",
-    "selectAll": "Select all"
+    "selectAll": "Select all",
+    "discardTitle": "Discard changes?",
+    "discardMessage": "You have unsaved changes. Are you sure you want to discard them?",
+    "discard": "Discard"
   },
   "attendance": {
     "checkIn": "Check In",

@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   LayoutDashboard,
@@ -7,7 +7,6 @@ import {
   CalendarClock,
   BarChart3,
   User as UserIcon,
-  LogOut,
   Dumbbell,
   Bookmark,
 } from 'lucide-react';
@@ -19,6 +18,7 @@ import { usePreferenceSync } from '../lib/usePreferenceSync';
 import { ContentLoader } from './page-loader';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { ThemeToggle } from './theme-toggle';
+import { UserMenu } from './user-menu';
 import { DensityToggle } from './density-toggle';
 
 interface NavItem {
@@ -39,17 +39,11 @@ const NAV_ITEMS: NavItem[] = [
 
 export function AppLayout() {
   const { t } = useTranslation();
-  const { user, signout } = useAuth();
-  const navigate = useNavigate();
+  const { user } = useAuth();
   useRealtimeOccupancy(); // live occupancy pushes while signed in
   usePreferenceSync(); // theme/density/locale follow the account
 
   const items = NAV_ITEMS.filter((i) => !i.roles || (user && i.roles.includes(user.role)));
-
-  async function handleSignout() {
-    await signout();
-    navigate('/login', { replace: true });
-  }
 
   return (
     <div className="flex min-h-screen flex-col bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
@@ -69,19 +63,7 @@ export function AppLayout() {
           <ThemeToggle />
           <DensityToggle />
           <LanguageSwitcher />
-          {user && (
-            <span className="hidden text-sm text-slate-600 sm:inline dark:text-slate-300">
-              {user.name} ·{' '}
-              <span className="text-slate-400 dark:text-slate-500">{t(`roles.${user.role}`)}</span>
-            </span>
-          )}
-          <button
-            onClick={handleSignout}
-            className="flex items-center gap-1 rounded-md px-2 py-1 text-sm text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
-          >
-            <LogOut size={16} />
-            <span className="hidden sm:inline">{t('auth.signOut')}</span>
-          </button>
+          <UserMenu />
         </div>
       </header>
 
