@@ -17,6 +17,7 @@ interface AuthContextValue {
   signin: (payload: SigninPayload) => Promise<void>;
   signup: (payload: SignupPayload) => Promise<void>;
   signout: () => Promise<void>;
+  updateUser: (user: User) => void;
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -69,9 +70,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }, []);
 
+  const updateUser = useCallback((u: User) => setUser(u), []);
+
   const value = useMemo(
-    () => ({ user, loading, signin, signup, signout }),
-    [user, loading, signin, signup, signout],
+    () => ({ user, loading, signin, signup, signout, updateUser }),
+    [user, loading, signin, signup, signout, updateUser],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
