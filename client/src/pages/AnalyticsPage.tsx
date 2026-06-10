@@ -134,7 +134,7 @@ export function AnalyticsPage() {
   );
 
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto max-w-6xl">
       <PageHeader
         icon={<BarChart3 size={24} />}
         title={t('pages.analytics.title')}
