@@ -171,3 +171,17 @@ body {
   outline: 2px solid var(--color-brand-300, #86efac);
   outline-offset: 1px;
 }
+
+/* ---- Pointer cursor on interactive controls (browsers/Tailwind don't add it
+   to <button> by default) ---- */
+button,
+[role='button'],
+select,
+summary {
+  cursor: pointer;
+}
+button:disabled,
+[role='button'][aria-disabled='true'],
+select:disabled {
+  cursor: not-allowed;
+}
