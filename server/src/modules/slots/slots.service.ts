@@ -86,12 +86,25 @@ export async function book(slotId: string, userId: string) {
   if (slot.bookings.some((b) => String(b) === userId)) {
     throw new HttpError(409, 'You have already booked this slot');
   }
-  if (slot.bookings.length >= slot.capacity) {
+
+  // Atomic guarded push: only adds the booking if the user isn't already in it
+  // AND there's free capacity — prevents two concurrent requests from both
+  // grabbing the last seat (overbooking race).
+  const uid = new Types.ObjectId(userId);
+  const updated = await Slot.findOneAndUpdate(
+    { _id: slot._id, bookings: { $ne: uid }, $expr: { $lt: [{ $size: '$bookings' }, '$capacity'] } },
+    { $push: { bookings: uid } },
+    { new: true },
+  );
+  if (!updated) {
+    // Lost the race or filled up between the read and the update.
+    const fresh = await Slot.findById(slotId);
+    if (fresh?.bookings.some((b) => String(b) === userId)) {
+      throw new HttpError(409, 'You have already booked this slot');
+    }
     throw new HttpError(409, 'This slot is fully booked');
   }
-  slot.bookings.push(new Types.ObjectId(userId));
-  await slot.save();
-  return toDto(slot.toObject() as SlotDoc, userId);
+  return toDto(updated.toObject() as SlotDoc, userId);
 }
 
 export async function cancel(slotId: string, userId: string) {
@@ -111,6 +124,11 @@ export async function cancel(slotId: string, userId: string) {
 // Admin / Trainer only.
 export async function create(input: CreateSlotInput) {
   const range = dayRange(input.date);
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+  if (range.from < today) {
+    throw new HttpError(409, 'Cannot create a slot in the past');
+  }
   await assertNoOverlap(range, input.startTime, input.endTime);
   return Slot.create({
     date: range.from,
