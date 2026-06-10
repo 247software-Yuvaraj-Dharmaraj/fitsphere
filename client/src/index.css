@@ -187,6 +187,18 @@ body {
   outline-offset: 1px;
 }
 
+/* ---- Toasts: brand-green success (overrides sonner richColors) ---- */
+[data-sonner-toast][data-type='success'] {
+  --success-bg: #f0fdf4;
+  --success-border: #16a34a;
+  --success-text: #166534;
+}
+[data-theme='dark'] [data-sonner-toast][data-type='success'] {
+  --success-bg: #052e16;
+  --success-border: #16a34a;
+  --success-text: #86efac;
+}
+
 /* ---- Pointer cursor on interactive controls (browsers/Tailwind don't add it
    to <button> by default) ---- */
 button,
