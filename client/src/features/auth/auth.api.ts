@@ -30,6 +30,18 @@ export async function updatePreferences(prefs: Partial<UserPreferences>): Promis
   return data;
 }
 
+export async function updateProfile(input: { name?: string; mobile?: string }): Promise<User> {
+  const { data } = await api.patch<User>('/auth/me', input);
+  return data;
+}
+
+export async function changePassword(input: {
+  currentPassword: string;
+  newPassword: string;
+}): Promise<void> {
+  await api.post('/auth/me/password', input);
+}
+
 export async function logout(): Promise<void> {
   const refreshToken = tokenStore.getRefresh();
   try {

@@ -166,7 +166,13 @@
     "notePlaceholder": "இந்த உறுப்பினருக்கு வாராந்திர கருத்தை எழுதவும்...",
     "submit": "கருத்தை அனுப்பு",
     "sentToast": "கருத்து அனுப்பப்பட்டது!",
-    "memberFeedback": "கருத்து வரலாறு"
+    "memberFeedback": "கருத்து வரலாறு",
+    "editProfile": "சுயவிவரத்தைத் திருத்து",
+    "changePassword": "கடவுச்சொல்லை மாற்று",
+    "currentPassword": "தற்போதைய கடவுச்சொல்",
+    "newPassword": "புதிய கடவுச்சொல்",
+    "profileUpdated": "சுயவிவரம் புதுப்பிக்கப்பட்டது.",
+    "passwordChanged": "கடவுச்சொல் மாற்றப்பட்டது."
   },
   "pages": {
     "dashboard": {

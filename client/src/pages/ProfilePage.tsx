@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Mail, Shield, UserCircle, Send } from 'lucide-react';
 import { useAuth } from '../features/auth/useAuth';
+import { changePassword, updateProfile } from '../features/auth/auth.api';
 import {
   useCreateFeedback,
   useFeedbackMembers,
@@ -16,6 +17,7 @@ import { Card } from '../components/ui/card';
 import { Select } from '../components/ui/select';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
+import { TextField } from '../components/ui/text-field';
 import { fieldClasses } from '../components/ui/field';
 
 export function ProfilePage() {
@@ -52,8 +54,105 @@ export function ProfilePage() {
         </div>
       </Card>
 
+      <section className="mb-6 grid gap-4 lg:grid-cols-2">
+        <EditProfileForm />
+        <ChangePasswordForm />
+      </section>
+
       {isStaff ? <StaffFeedback /> : <MemberFeedback />}
     </div>
+  );
+}
+
+function EditProfileForm() {
+  const { t } = useTranslation();
+  const { user, updateUser } = useAuth();
+  const [name, setName] = useState(user?.name ?? '');
+  const [mobile, setMobile] = useState(user?.mobile ?? '');
+  const [saving, setSaving] = useState(false);
+
+  const dirty = name !== (user?.name ?? '') || mobile !== (user?.mobile ?? '');
+
+  async function submit(e: FormEvent) {
+    e.preventDefault();
+    if (!dirty) return;
+    setSaving(true);
+    try {
+      const updated = await updateProfile({ name, mobile: mobile || undefined });
+      updateUser(updated);
+      toast.success(t('profile.profileUpdated'));
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, 'Update failed'));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <Card className="p-6">
+      <h2 className="mb-4 text-sm font-semibold text-slate-700 dark:text-slate-200">
+        {t('profile.editProfile')}
+      </h2>
+      <form onSubmit={submit} className="space-y-4">
+        <TextField label={t('auth.name')} value={name} onChange={(e) => setName(e.target.value)} required minLength={2} />
+        <TextField label={t('auth.mobile')} value={mobile} onChange={(e) => setMobile(e.target.value)} />
+        <Button type="submit" loading={saving} disabled={!dirty}>
+          {t('common.save')}
+        </Button>
+      </form>
+    </Card>
+  );
+}
+
+function ChangePasswordForm() {
+  const { t } = useTranslation();
+  const [current, setCurrent] = useState('');
+  const [next, setNext] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  async function submit(e: FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      await changePassword({ currentPassword: current, newPassword: next });
+      toast.success(t('profile.passwordChanged'));
+      setCurrent('');
+      setNext('');
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, 'Could not change password'));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <Card className="p-6">
+      <h2 className="mb-4 text-sm font-semibold text-slate-700 dark:text-slate-200">
+        {t('profile.changePassword')}
+      </h2>
+      <form onSubmit={submit} className="space-y-4">
+        <TextField
+          label={t('profile.currentPassword')}
+          type="password"
+          value={current}
+          onChange={(e) => setCurrent(e.target.value)}
+          required
+          autoComplete="current-password"
+        />
+        <TextField
+          label={t('profile.newPassword')}
+          type="password"
+          value={next}
+          onChange={(e) => setNext(e.target.value)}
+          required
+          minLength={6}
+          autoComplete="new-password"
+        />
+        <Button type="submit" loading={saving} disabled={!current || next.length < 6}>
+          {t('profile.changePassword')}
+        </Button>
+      </form>
+    </Card>
   );
 }
 

@@ -98,6 +98,27 @@ export async function getMe(userId: string) {
   return toPublicUser(user);
 }
 
+export async function updateProfile(
+  userId: string,
+  input: { name?: string; mobile?: string },
+) {
+  const user = await User.findById(userId);
+  if (!user) throw new HttpError(404, 'User not found');
+  if (input.name !== undefined) user.name = input.name;
+  if (input.mobile !== undefined) user.mobile = input.mobile || undefined;
+  await user.save(); // duplicate mobile -> Mongo 11000 -> 409 via error handler
+  return toPublicUser(user);
+}
+
+export async function changePassword(userId: string, currentPassword: string, newPassword: string) {
+  const user = await User.findById(userId);
+  if (!user) throw new HttpError(404, 'User not found');
+  const ok = await bcrypt.compare(currentPassword, user.passwordHash);
+  if (!ok) throw new HttpError(400, 'Current password is incorrect');
+  user.passwordHash = await bcrypt.hash(newPassword, 10);
+  await user.save();
+}
+
 export async function updatePreferences(
   userId: string,
   prefs: Partial<{ theme: 'light' | 'dark'; density: 'comfortable' | 'compact'; locale: string }>,

@@ -18,6 +18,20 @@ export const refreshSchema = z.object({
   refreshToken: z.string().min(1, 'Refresh token is required'),
 });
 
+export const updateProfileSchema = z
+  .object({
+    name: z.string().min(2, 'Name is too short').optional(),
+    mobile: z.string().min(7).max(15).optional(),
+  })
+  .refine((d) => d.name !== undefined || d.mobile !== undefined, {
+    message: 'Nothing to update',
+  });
+
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1, 'Current password is required'),
+  newPassword: z.string().min(6, 'Password must be at least 6 characters'),
+});
+
 export const preferencesSchema = z
   .object({
     theme: z.enum(['light', 'dark']).optional(),

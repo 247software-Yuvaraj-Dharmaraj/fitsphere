@@ -166,7 +166,13 @@
     "notePlaceholder": "Write weekly feedback for this member...",
     "submit": "Send feedback",
     "sentToast": "Feedback sent!",
-    "memberFeedback": "Feedback history"
+    "memberFeedback": "Feedback history",
+    "editProfile": "Edit profile",
+    "changePassword": "Change password",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "profileUpdated": "Profile updated.",
+    "passwordChanged": "Password changed."
   },
   "pages": {
     "dashboard": {

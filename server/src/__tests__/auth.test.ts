@@ -65,6 +65,41 @@ describe('auth', () => {
     expect(me.body.role).toBe('ADMIN');
   });
 
+  it('updates profile name', async () => {
+    const u = await makeUser('MEMBER');
+    const res = await request(app)
+      .patch('/api/auth/me')
+      .set(auth(u.token))
+      .send({ name: 'Renamed User' });
+    expect(res.status).toBe(200);
+    expect(res.body.name).toBe('Renamed User');
+  });
+
+  it('changes password (rejects wrong current, then signs in with the new one)', async () => {
+    const email = `pw-${Math.random().toString(36).slice(2, 8)}@test.app`;
+    const signup = await request(app)
+      .post('/api/auth/signup')
+      .send({ name: 'PW User', email, password: 'password123' });
+    const token = signup.body.accessToken;
+
+    const wrong = await request(app)
+      .post('/api/auth/me/password')
+      .set(auth(token))
+      .send({ currentPassword: 'nope', newPassword: 'newpass123' });
+    expect(wrong.status).toBe(400);
+
+    const ok = await request(app)
+      .post('/api/auth/me/password')
+      .set(auth(token))
+      .send({ currentPassword: 'password123', newPassword: 'newpass123' });
+    expect(ok.status).toBe(204);
+
+    const signin = await request(app)
+      .post('/api/auth/signin')
+      .send({ email, password: 'newpass123' });
+    expect(signin.status).toBe(200);
+  });
+
   it('defaults preferences and persists updates', async () => {
     const user = await makeUser('MEMBER');
     const me = await request(app).get('/api/auth/me').set(auth(user.token));
