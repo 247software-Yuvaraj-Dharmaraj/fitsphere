@@ -1,13 +1,13 @@
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { Toaster } from 'sonner';
 import { queryClient } from './lib/queryClient';
 import { ThemeProvider } from './context/theme-context';
 import { DensityProvider } from './context/density-context';
 import { AuthProvider } from './features/auth/AuthContext';
 import { ErrorBoundary } from './components/error-boundary';
 import { FullPageLoader } from './components/page-loader';
+import { AppToaster } from './components/app-toaster';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AppLayout } from './components/AppLayout';
 import { LoginPage } from './pages/LoginPage';
@@ -62,7 +62,7 @@ export default function App() {
                   <Route path="*" element={<Navigate to="/dashboard" replace />} />
                 </Routes>
               </Suspense>
-              <Toaster richColors position="top-right" theme="system" />
+              <AppToaster />
             </AuthProvider>
           </BrowserRouter>
         </QueryClientProvider>
