@@ -5,25 +5,15 @@ import { toast } from 'sonner';
 import { User, Mail, Phone, Lock, UserPlus } from 'lucide-react';
 import { useAuth } from '../features/auth/useAuth';
 import { getApiErrorMessage } from '../lib/api';
-import type { Role } from '../features/auth/auth.types';
 import { AuthShell } from './LoginPage';
 import { TextField } from '../components/ui/text-field';
-import { Select } from '../components/ui/select';
 import { Button } from '../components/ui/button';
-
-const ROLES: Role[] = ['MEMBER', 'TRAINER', 'ADMIN'];
 
 export function SignupPage() {
   const { t } = useTranslation();
   const { signup } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({
-    name: '',
-    email: '',
-    mobile: '',
-    password: '',
-    role: 'MEMBER' as Role,
-  });
+  const [form, setForm] = useState({ name: '', email: '', mobile: '', password: '' });
   const [submitting, setSubmitting] = useState(false);
 
   function update<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
@@ -39,7 +29,6 @@ export function SignupPage() {
         email: form.email,
         mobile: form.mobile || undefined,
         password: form.password,
-        role: form.role,
       });
       navigate('/dashboard', { replace: true });
     } catch (err) {
@@ -83,12 +72,6 @@ export function SignupPage() {
           value={form.password}
           onChange={(e) => update('password', e.target.value)}
           autoComplete="new-password"
-        />
-        <Select
-          label={t('auth.role')}
-          value={form.role}
-          onChange={(e) => update('role', e.target.value as Role)}
-          options={ROLES.map((r) => ({ value: r, label: t(`roles.${r}`) }))}
         />
         <Button type="submit" loading={submitting} className="w-full">
           {!submitting && <UserPlus size={16} />}

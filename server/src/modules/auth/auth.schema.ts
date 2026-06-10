@@ -1,13 +1,12 @@
 import { z } from 'zod';
-import { ROLES } from '../../models/index.js';
 
+// Public signup always creates a MEMBER — roles are NOT self-assignable.
+// Trainer/Admin accounts are provisioned by seeding / invite only.
 export const signupSchema = z.object({
   name: z.string().min(2, 'Name is too short'),
   email: z.string().email('Invalid email'),
   mobile: z.string().min(7).max(15).optional(),
   password: z.string().min(6, 'Password must be at least 6 characters'),
-  // Allow choosing a role at signup for the demo; defaults to MEMBER.
-  role: z.enum(ROLES).optional(),
 });
 
 export const signinSchema = z.object({

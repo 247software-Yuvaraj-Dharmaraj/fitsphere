@@ -45,7 +45,7 @@ export async function signup(input: SignupInput) {
     email: input.email.toLowerCase(),
     mobile: input.mobile,
     passwordHash,
-    role: input.role ?? 'MEMBER',
+    role: 'MEMBER', // public signup is always a member; roles aren't self-assignable
   });
 
   const tokens = issueTokens(user);

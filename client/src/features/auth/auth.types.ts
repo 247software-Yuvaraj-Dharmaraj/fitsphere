@@ -26,7 +26,6 @@ export interface SignupPayload {
   email: string;
   mobile?: string;
   password: string;
-  role?: Role;
 }
 
 export interface SigninPayload {
