@@ -1,5 +1,13 @@
 # FitSphere
 
+![CI](https://github.com/247software-Yuvaraj-Dharmaraj/fitsphere/actions/workflows/ci.yml/badge.svg)
+![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
+![React](https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-339933?logo=node.js&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-47A248?logo=mongodb&logoColor=white)
+![Socket.io](https://img.shields.io/badge/Socket.io-010101?logo=socket.io&logoColor=white)
+
 A full-stack gym attendance, occupancy & engagement platform — built as a
 production-style demonstration of a modern **React + Node + MongoDB** stack with
 role-based access control.
@@ -32,8 +40,6 @@ data-driven dashboards.
   cancellation (AbortController) and debounced search
 
 ## Screenshots
-
-> Drop PNGs into `screenshots/` with these names and they'll render here.
 
 | Member Dashboard | Admin Analytics |
 |---|---|
