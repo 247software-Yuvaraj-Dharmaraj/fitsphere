@@ -11,6 +11,19 @@ function dayRange(date: string) {
   return { from, to };
 }
 
+// Slots are gym-wide and date-only, so "today"/"past" are judged in the gym's
+// timezone (GYM_TZ_OFFSET, minutes east of UTC) — not UTC, which would make an
+// early-morning gym day look like the previous day. Returned as UTC midnight of
+// the gym's current date, so it compares correctly against stored slot dates.
+const GYM_OFFSET = Number(process.env.GYM_TZ_OFFSET) || 0;
+function gymTodayKey() {
+  return new Date(Date.now() + GYM_OFFSET * 60_000).toISOString().slice(0, 10);
+}
+function gymToday() {
+  const [y, m, d] = gymTodayKey().split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1, d));
+}
+
 function dayRangeOf(date: Date) {
   const from = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
   const to = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + 1));
@@ -72,7 +85,7 @@ function toDto(slot: SlotDoc, userId: string) {
 
 // Defaults to today (UTC) when no date is given.
 export async function listByDate(userId: string, date?: string) {
-  const target = date ?? new Date().toISOString().slice(0, 10);
+  const target = date ?? gymTodayKey();
   const { from, to } = dayRange(target);
   const slots = await Slot.find({ date: { $gte: from, $lt: to } })
     .sort({ startTime: 1 })
@@ -83,8 +96,7 @@ export async function listByDate(userId: string, date?: string) {
 // A member's own upcoming slots (today onward), across all days — both confirmed
 // bookings and waitlist entries (the DTO flags which is which).
 export async function myBookings(userId: string) {
-  const today = new Date();
-  today.setUTCHours(0, 0, 0, 0);
+  const today = gymToday();
   const uid = new Types.ObjectId(userId);
   const slots = await Slot.find({
     date: { $gte: today },
@@ -100,10 +112,8 @@ export async function book(slotId: string, userId: string) {
   const slot = await Slot.findById(slotId);
   if (!slot) throw new HttpError(404, 'Slot not found');
 
-  // Can't book a slot on a day that's already past.
-  const today = new Date();
-  today.setUTCHours(0, 0, 0, 0);
-  if (slot.date < today) {
+  // Can't book a slot on a day that's already past (in the gym's timezone).
+  if (slot.date < gymToday()) {
     throw new HttpError(409, 'This slot has already passed');
   }
 
@@ -180,9 +190,7 @@ export async function joinWaitlist(slotId: string, userId: string) {
   const slot = await Slot.findById(slotId);
   if (!slot) throw new HttpError(404, 'Slot not found');
 
-  const today = new Date();
-  today.setUTCHours(0, 0, 0, 0);
-  if (slot.date < today) throw new HttpError(409, 'This slot has already passed');
+  if (slot.date < gymToday()) throw new HttpError(409, 'This slot has already passed');
 
   if (slot.bookings.some((b) => String(b) === userId)) {
     throw new HttpError(409, 'You have already booked this slot');
@@ -218,9 +226,7 @@ export async function leaveWaitlist(slotId: string, userId: string) {
 // Admin / Trainer only.
 export async function create(input: CreateSlotInput) {
   const range = dayRange(input.date);
-  const today = new Date();
-  today.setUTCHours(0, 0, 0, 0);
-  if (range.from < today) {
+  if (range.from < gymToday()) {
     throw new HttpError(409, 'Cannot create a slot in the past');
   }
   await assertNoOverlap(range, input.startTime, input.endTime);
