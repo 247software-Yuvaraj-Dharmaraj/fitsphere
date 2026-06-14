@@ -17,6 +17,11 @@ export function LoginPage() {
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
+  function fillDemo(demoEmail: string) {
+    setEmail(demoEmail);
+    setPassword('password123');
+  }
+
   const from =
     (location.state as { from?: { pathname: string } } | null)?.from?.pathname ?? '/dashboard';
 
@@ -65,9 +70,26 @@ export function LoginPage() {
           {t('auth.signUp')}
         </Link>
       </p>
-      <p className="mt-2 text-center text-xs text-slate-400 dark:text-slate-500">
-        {t('auth.demoHint')}
-      </p>
+      <div className="mt-4 border-t border-slate-200 pt-4 dark:border-slate-800">
+        <p className="text-center text-xs text-slate-400 dark:text-slate-500">{t('auth.demoHint')}</p>
+        <div className="mt-2 flex items-center justify-center gap-2">
+          {[
+            { role: 'MEMBER', email: 'member@fitsphere.app' },
+            { role: 'TRAINER', email: 'trainer@fitsphere.app' },
+            { role: 'ADMIN', email: 'admin@fitsphere.app' },
+          ].map((d) => (
+            <button
+              key={d.email}
+              type="button"
+              onClick={() => fillDemo(d.email)}
+              title={`${d.email} / password123`}
+              className="rounded-full border border-slate-200 px-3 py-1 text-xs font-medium text-slate-600 transition hover:border-brand-400 hover:text-brand-600 dark:border-slate-700 dark:text-slate-300 dark:hover:text-brand-400"
+            >
+              {t(`roles.${d.role}`)}
+            </button>
+          ))}
+        </div>
+      </div>
     </AuthShell>
   );
 }

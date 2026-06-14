@@ -26,7 +26,7 @@
     "creatingAccount": "Creating account...",
     "welcomeBack": "Welcome back",
     "createAccount": "Create your account",
-    "demoHint": "Demo: admin@fitsphere.app / password123"
+    "demoHint": "Demo accounts — click to fill"
   },
   "roles": {
     "MEMBER": "Member",
