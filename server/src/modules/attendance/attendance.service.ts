@@ -31,6 +31,17 @@ function startOfDay(now: Date = new Date(), offsetMin = 0): Date {
   return new Date(d.getTime() - offsetMin * MIN_MS);
 }
 
+// Single gym-wide timezone for GLOBAL metrics (live-occupancy day boundary,
+// busiest-hours grouping) — these reflect the gym's own clock, not each viewer's.
+// Offset in minutes east of UTC; set GYM_TZ_OFFSET (e.g. 330 for IST). Default 0.
+const GYM_OFFSET = Number(process.env.GYM_TZ_OFFSET) || 0;
+// Mongo's $hour accepts a UTC-offset string ("+05:30") as its `timezone`.
+function offsetTz(min: number): string {
+  const sign = min < 0 ? '-' : '+';
+  const a = Math.abs(min);
+  return `${sign}${String(Math.floor(a / 60)).padStart(2, '0')}:${String(a % 60).padStart(2, '0')}`;
+}
+
 async function getCapacity(): Promise<number> {
   const config = await GymConfig.findOne();
   return config?.capacity ?? 50;
@@ -41,7 +52,7 @@ async function getCapacity(): Promise<number> {
 // inflating occupancy forever.
 export async function getOccupancy() {
   const [activeCount, capacity] = await Promise.all([
-    Attendance.countDocuments({ checkOutAt: null, checkInAt: { $gte: startOfDay() } }),
+    Attendance.countDocuments({ checkOutAt: null, checkInAt: { $gte: startOfDay(new Date(), GYM_OFFSET) } }),
     getCapacity(),
   ]);
   const percent = capacity > 0 ? Math.round((activeCount / capacity) * 100) : 0;
@@ -54,7 +65,7 @@ export async function getOccupancy() {
 }
 
 export async function checkIn(userId: string) {
-  const today = startOfDay();
+  const today = startOfDay(new Date(), GYM_OFFSET);
   const open = await Attendance.findOne({ user: userId, checkOutAt: null });
   if (open) {
     if (open.checkInAt >= today) throw new HttpError(409, 'You are already checked in');
@@ -166,13 +177,14 @@ export async function getTrend(userId: string, days: number, offsetMin = 0) {
 // Suggests the least-busy gym hours, derived from check-in history over the
 // last 30 days (gym-wide). Powers the dashboard "best time to train" hint.
 export async function getBestTime() {
-  const since = new Date();
-  since.setUTCHours(0, 0, 0, 0);
+  // Gym-local window + hour-of-day grouping, so "busiest hours" reflect the
+  // gym's clock rather than UTC.
+  const since = startOfDay(new Date(), GYM_OFFSET);
   since.setUTCDate(since.getUTCDate() - 30);
 
   const agg = await Attendance.aggregate<{ _id: number; count: number }>([
     { $match: { checkInAt: { $gte: since } } },
-    { $group: { _id: { $hour: '$checkInAt' }, count: { $sum: 1 } } },
+    { $group: { _id: { $hour: { date: '$checkInAt', timezone: offsetTz(GYM_OFFSET) } }, count: { $sum: 1 } } },
   ]);
   const map = new Map(agg.map((a) => [a._id, a.count]));
 
