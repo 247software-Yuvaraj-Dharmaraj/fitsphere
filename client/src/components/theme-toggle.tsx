@@ -8,7 +8,7 @@ export function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
   const label = theme === 'dark' ? t('common.lightMode') : t('common.darkMode');
   return (
-    <Tooltip label={label}>
+    <Tooltip label={label} side="bottom">
       <button
         onClick={toggleTheme}
         aria-label={label}
