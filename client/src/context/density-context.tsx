@@ -25,6 +25,7 @@ export function DensityProvider({ children }: { children: ReactNode }) {
   const [density, setDensity] = useState<Density>(getInitial);
 
   useEffect(() => {
+    document.documentElement.dataset.density = density;
     localStorage.setItem('density', density);
   }, [density]);
 

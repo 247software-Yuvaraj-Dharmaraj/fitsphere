@@ -282,7 +282,7 @@ function StatCard({
         {icon}
         {label}
       </div>
-      <div className="mt-1 text-2xl font-bold text-slate-800 dark:text-slate-100">{value}</div>
+      <div className="mt-1 font-display text-2xl font-bold tabular-nums text-slate-800 dark:text-slate-100">{value}</div>
     </Card>
   );
 }

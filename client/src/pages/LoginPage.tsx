@@ -76,11 +76,13 @@ export function AuthShell({ title, children }: { title: string; children: ReactN
   const { t } = useTranslation();
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-brand-50 to-slate-100 p-4 dark:from-slate-900 dark:to-slate-950">
-      <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+      <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-8 shadow-xl shadow-slate-300/30 dark:border-slate-800 dark:bg-slate-900 dark:shadow-black/40">
         <div className="mb-6 text-center">
-          <div className="mb-2 flex items-center justify-center gap-2 text-brand-700 dark:text-brand-500">
-            <Dumbbell size={26} />
-            <span className="text-xl font-bold">{t('app.name')}</span>
+          <div className="mb-2 flex items-center justify-center gap-2">
+            <Dumbbell size={26} className="text-brand-600 dark:text-brand-500" />
+            <span className="bg-gradient-to-r from-brand-700 to-brand-400 bg-clip-text font-display text-2xl font-bold tracking-tight text-transparent dark:from-brand-400 dark:to-brand-300">
+              {t('app.name')}
+            </span>
           </div>
           <h1 className="text-lg font-semibold text-slate-800 dark:text-slate-100">{title}</h1>
         </div>

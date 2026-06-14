@@ -140,7 +140,7 @@ export function AttendancePage() {
               <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400">
                 {t('attendance.streak')}
               </h2>
-              <p className="mt-1 text-3xl font-bold text-slate-800 dark:text-slate-100">
+              <p className="mt-1 font-display text-3xl font-bold tabular-nums text-slate-800 dark:text-slate-100">
                 {s.streak}{' '}
                 <span className="text-base font-medium text-slate-400">{t('attendance.days')}</span>
               </p>
@@ -178,7 +178,7 @@ function StatCard({
         {icon}
         {label}
       </div>
-      <div className="mt-1 text-xl font-bold text-slate-800 dark:text-slate-100">{value}</div>
+      <div className="mt-1 font-display text-xl font-bold tabular-nums text-slate-800 dark:text-slate-100">{value}</div>
     </Card>
   );
 }
