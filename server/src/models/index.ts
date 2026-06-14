@@ -67,10 +67,17 @@ export const GymConfig = model('GymConfig', gymConfigSchema);
 
 // ---- Attendance ----
 const attendanceSchema = new Schema({
-  user: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+  user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   checkInAt: { type: Date, default: Date.now, index: true },
   checkOutAt: { type: Date, default: null },
 });
+
+// Hot path: month/trend/summary filter by user + checkInAt range — this compound
+// index serves them in one shot, and its `user` prefix also covers user-only
+// lookups (so a standalone `user` index would be redundant). The standalone
+// `checkInAt` index above still serves the user-agnostic occupancy/best-time
+// queries.
+attendanceSchema.index({ user: 1, checkInAt: 1 });
 
 export const Attendance = model('Attendance', attendanceSchema);
 
