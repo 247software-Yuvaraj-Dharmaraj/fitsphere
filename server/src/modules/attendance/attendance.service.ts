@@ -1,3 +1,4 @@
+import { Types } from 'mongoose';
 import { Attendance, GymConfig } from '../../models/index.js';
 import { HttpError } from '../../middleware/error.js';
 import { emitOccupancy } from '../../lib/realtime.js';
@@ -114,15 +115,32 @@ function computeStreak(dayKeys: Set<string>, offsetMin = 0): number {
   return streak;
 }
 
+// Streaks longer than this won't be fully counted — at a daily gym cadence
+// that's >1 year, so we bound the history we pull instead of loading it all on
+// every summary (which refetches every 30s). Week/month windows fit inside it.
+const STREAK_WINDOW_DAYS = 400;
+
 export async function getSummary(userId: string, offsetMin = 0) {
   const now = new Date();
-  const [open, all, occupancy] = await Promise.all([
+  const windowStart = new Date(now.getTime() - STREAK_WINDOW_DAYS * 86_400_000);
+
+  const [open, recent, occupancy, distinctDays] = await Promise.all([
     Attendance.findOne({ user: userId, checkOutAt: null }),
-    Attendance.find({ user: userId }).select('checkInAt').lean(),
+    // Recent window only — enough for streak + this week/month.
+    Attendance.find({ user: userId, checkInAt: { $gte: windowStart } }).select('checkInAt').lean(),
     getOccupancy(),
+    // All-time distinct local days, counted server-side (never pulls full history).
+    Attendance.aggregate<{ _id: string }>([
+      { $match: { user: new Types.ObjectId(userId) } },
+      {
+        $group: {
+          _id: { $dateToString: { date: '$checkInAt', format: '%Y-%m-%d', timezone: offsetTz(offsetMin) } },
+        },
+      },
+    ]),
   ]);
 
-  const dayKeys = new Set(all.map((a) => dayKey(new Date(a.checkInAt as Date), offsetMin)));
+  const dayKeys = new Set(recent.map((a) => dayKey(new Date(a.checkInAt as Date), offsetMin)));
   const streak = computeStreak(dayKeys, offsetMin);
 
   // Compare on local day-key strings (ISO dates sort lexicographically).
@@ -139,7 +157,7 @@ export async function getSummary(userId: string, offsetMin = 0) {
     since: checkedInToday ? (open!.checkInAt ?? null) : null,
     streak,
     milestones: { 3: streak >= 3, 7: streak >= 7, 14: streak >= 14 },
-    totals: { thisWeek, thisMonth, allTime: dayKeys.size },
+    totals: { thisWeek, thisMonth, allTime: distinctDays.length },
     occupancy,
   };
 }
