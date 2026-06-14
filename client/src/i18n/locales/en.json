@@ -142,7 +142,7 @@
     },
     "staff": {
       "liveOccupancy": "Live occupancy",
-      "inactiveThisWeek": "Inactive / wk",
+      "awayThisWeek": "Away / wk",
       "todaysClasses": "Today's classes",
       "noClassesToday": "No classes scheduled today.",
       "checkInTrend": "Check-in trend",

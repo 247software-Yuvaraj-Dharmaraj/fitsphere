@@ -1,4 +1,5 @@
 import { type ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Users, Activity, UserMinus, Clock, CalendarClock, LayoutDashboard, Gauge } from 'lucide-react';
@@ -90,10 +91,10 @@ export function StaffDashboard() {
           Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
         ) : (
           <>
-            <Kpi icon={<Users size={18} className="text-brand-600" />} label={t('analytics.totalMembers')} value={o ? `${o.totals.totalMembers}` : '—'} />
-            <Kpi icon={<Activity size={18} className="text-green-600" />} label={t('analytics.activeThisWeek')} value={o ? `${o.totals.activeThisWeek}` : '—'} />
-            <Kpi icon={<UserMinus size={18} className="text-orange-500" />} label={t('dashboard.staff.inactiveThisWeek')} value={o ? `${inactive}` : '—'} />
-            <Kpi icon={<Clock size={18} className="text-slate-500" />} label={t('analytics.peakHour')} value={peakLabel} />
+            <Kpi to="/analytics" icon={<Users size={18} className="text-brand-600" />} label={t('analytics.totalMembers')} value={o ? `${o.totals.totalMembers}` : '—'} />
+            <Kpi to="/analytics" icon={<Activity size={18} className="text-green-600" />} label={t('analytics.activeThisWeek')} value={o ? `${o.totals.activeThisWeek}` : '—'} />
+            <Kpi to="/analytics" icon={<UserMinus size={18} className="text-orange-500" />} label={t('dashboard.staff.awayThisWeek')} value={o ? `${inactive}` : '—'} />
+            <Kpi to="/analytics" icon={<Clock size={18} className="text-slate-500" />} label={t('analytics.peakHour')} value={peakLabel} />
           </>
         )}
       </section>
@@ -119,19 +120,24 @@ export function StaffDashboard() {
                 const pct = Math.min(100, Math.round((s.bookedCount / s.capacity) * 100));
                 return (
                   <li key={s.id}>
-                    <div className="flex items-center justify-between gap-2 text-sm">
-                      <span className="flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200">
-                        {s.startTime} – {s.endTime}
-                        {s.isFull && <Badge tone="red">{t('dashboard.staff.full')}</Badge>}
-                        {s.waitlistCount > 0 && <Badge tone="amber">{t('slots.waiting', { count: s.waitlistCount })}</Badge>}
-                      </span>
-                      <span className="tabular-nums text-slate-500 dark:text-slate-400">
-                        {s.bookedCount}/{s.capacity}
-                      </span>
-                    </div>
-                    <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
-                      <div className="h-full rounded-full bg-brand-500" style={{ width: `${pct}%` }} />
-                    </div>
+                    <Link
+                      to="/slots"
+                      className="-mx-2 block rounded-lg px-2 py-1.5 transition hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                    >
+                      <div className="flex items-center justify-between gap-2 text-sm">
+                        <span className="flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200">
+                          {s.startTime} – {s.endTime}
+                          {s.isFull && <Badge tone="red">{t('dashboard.staff.full')}</Badge>}
+                          {s.waitlistCount > 0 && <Badge tone="amber">{t('slots.waiting', { count: s.waitlistCount })}</Badge>}
+                        </span>
+                        <span className="tabular-nums text-slate-500 dark:text-slate-400">
+                          {s.bookedCount}/{s.capacity}
+                        </span>
+                      </div>
+                      <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                        <div className="h-full rounded-full bg-brand-500" style={{ width: `${pct}%` }} />
+                      </div>
+                    </Link>
                   </li>
                 );
               })}
@@ -190,14 +196,22 @@ function Panel({
   );
 }
 
-function Kpi({ icon, label, value }: { icon: ReactNode; label: string; value: string }) {
-  return (
-    <Card className="p-4">
+function Kpi({ icon, label, value, to }: { icon: ReactNode; label: string; value: string; to?: string }) {
+  const card = (
+    <Card className="h-full p-4">
       <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
         {icon}
         {label}
       </div>
       <div className="mt-1 font-display text-2xl font-bold tabular-nums text-slate-800 dark:text-slate-100">{value}</div>
     </Card>
+  );
+  // Tiles drill into the Analytics page (summary → detail) instead of duplicating it.
+  return to ? (
+    <Link to={to} className="block">
+      {card}
+    </Link>
+  ) : (
+    card
   );
 }

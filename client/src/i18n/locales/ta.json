@@ -142,7 +142,7 @@
     },
     "staff": {
       "liveOccupancy": "தற்போதைய நெரிசல்",
-      "inactiveThisWeek": "செயலற்றோர் / வாரம்",
+      "awayThisWeek": "வராதோர் / வாரம்",
       "todaysClasses": "இன்றைய வகுப்புகள்",
       "noClassesToday": "இன்று வகுப்புகள் எதுவும் இல்லை.",
       "checkInTrend": "வருகை போக்கு",
