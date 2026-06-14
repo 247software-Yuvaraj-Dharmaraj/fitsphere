@@ -111,13 +111,16 @@ export async function seedDatabase(): Promise<void> {
 
   // Slots: a full week ahead with realistic bookings + a waitlist.
   const memberIds = members.map((u) => u._id);
+  // Fill random bookings from everyone EXCEPT the demo member, so her "My Bookings" reflects
+  // only the slots we book her into explicitly (below) rather than every slot.
+  const fillPool = memberIds.filter((id) => String(id) !== String(member._id));
   const times: [number, number, number][] = [[6, 7, 15], [7, 8, 20], [12, 13, 12], [17, 18, 20], [18, 19, 25], [19, 20, 20]];
   const slots: Record<string, unknown>[] = [];
   for (let d = 0; d < 7; d++) {
     const date = addDays(base, d);
     for (const [sh, eh, cap] of times) {
       const fill = Math.min(cap, rint(Math.floor(cap / 2) + 1) + Math.floor(cap / 3));
-      const shuffled = [...memberIds].sort(() => Math.random() - 0.5);
+      const shuffled = [...fillPool].sort(() => Math.random() - 0.5);
       slots.push({ date, startTime: hh(sh), endTime: hh(eh), capacity: cap, bookings: shuffled.slice(0, fill), waitlist: [] });
     }
   }
