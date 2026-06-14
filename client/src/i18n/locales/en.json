@@ -139,6 +139,14 @@
       "CARDIO": "Cardio",
       "STRENGTH": "Strength",
       "MIXED": "Mixed"
+    },
+    "staff": {
+      "liveOccupancy": "Live occupancy",
+      "inactiveThisWeek": "Inactive / wk",
+      "todaysClasses": "Today's classes",
+      "noClassesToday": "No classes scheduled today.",
+      "checkInTrend": "Check-in trend",
+      "full": "Full"
     }
   },
   "analytics": {
@@ -189,7 +197,8 @@
   "pages": {
     "dashboard": {
       "title": "Dashboard",
-      "subtitle": "Your attendance and consistency at a glance."
+      "subtitle": "Your attendance and consistency at a glance.",
+      "staffSubtitle": "Live gym operations at a glance."
     },
     "attendance": {
       "title": "Attendance",

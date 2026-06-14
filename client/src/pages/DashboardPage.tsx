@@ -26,11 +26,13 @@ import {
 import type { WorkoutType } from '../features/workouts/workouts.api';
 import { getApiErrorMessage } from '../lib/api';
 import { useChartTooltip } from '../lib/useChartTooltip';
+import { useAuth } from '../features/auth/useAuth';
 import { PageHeader } from '../components/ui/page-header';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Empty } from '../components/ui/empty';
 import { fieldClasses } from '../components/ui/field';
+import { StaffDashboard } from './StaffDashboard';
 
 const WORKOUT_TYPES: WorkoutType[] = ['CARDIO', 'STRENGTH', 'MIXED'];
 const TYPE_COLORS: Record<WorkoutType, string> = {
@@ -40,7 +42,15 @@ const TYPE_COLORS: Record<WorkoutType, string> = {
 };
 const tickStyle = { fontSize: 11, fill: '#94a3b8' };
 
+// Role-aware entry: staff (TRAINER/ADMIN) get the operational dashboard,
+// members get the personal one below. The lazy import in App.tsx targets this.
 export function DashboardPage() {
+  const { user } = useAuth();
+  const isStaff = user?.role === 'ADMIN' || user?.role === 'TRAINER';
+  return isStaff ? <StaffDashboard /> : <MemberDashboard />;
+}
+
+function MemberDashboard() {
   const { t, i18n } = useTranslation();
   const summary = useAttendanceSummary();
   const trend = useAttendanceTrend(14);
