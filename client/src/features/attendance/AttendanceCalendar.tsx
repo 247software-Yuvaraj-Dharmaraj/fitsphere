@@ -19,7 +19,9 @@ export function AttendanceCalendar({ year, month, attendedDays, onPrev, onNext, 
   const firstDay = new Date(Date.UTC(year, month - 1, 1));
   const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
   const startWeekday = firstDay.getUTCDay(); // 0 Sun
-  const todayKey = new Date().toISOString().slice(0, 10);
+  // Local "today" so it matches the local day buckets returned by the API.
+  const today = new Date();
+  const todayKey = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
 
   const monthLabel = new Intl.DateTimeFormat(i18n.resolvedLanguage ?? 'en', {
     month: 'long',

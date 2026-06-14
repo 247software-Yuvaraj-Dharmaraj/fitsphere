@@ -2,24 +2,33 @@ import { Attendance, GymConfig } from '../../models/index.js';
 import { HttpError } from '../../middleware/error.js';
 import { emitOccupancy } from '../../lib/realtime.js';
 
-// ---- date helpers (UTC day buckets keep streak math timezone-stable) ----
-function dayKey(d: Date): string {
-  return d.toISOString().slice(0, 10); // YYYY-MM-DD
+// ---- date helpers ----
+// Day buckets are computed in the caller's local timezone, given as an offset in
+// minutes east of UTC (e.g. IST = +330). Personal stats (calendar, streak,
+// week/month) pass the user's offset so an early-morning local check-in counts
+// as "today" locally instead of slipping to the previous UTC day. offsetMin
+// defaults to 0 (UTC) for global metrics (occupancy) that don't pass one.
+const MIN_MS = 60_000;
+function shift(d: Date, offsetMin: number): Date {
+  return new Date(d.getTime() + offsetMin * MIN_MS);
 }
-function startOfWeek(now: Date): Date {
-  const d = new Date(now);
-  const day = d.getUTCDay(); // 0 = Sun
-  d.setUTCDate(d.getUTCDate() - day);
+function dayKey(d: Date, offsetMin = 0): string {
+  return shift(d, offsetMin).toISOString().slice(0, 10); // local YYYY-MM-DD
+}
+function startOfWeek(now: Date, offsetMin = 0): Date {
+  const d = shift(now, offsetMin);
+  d.setUTCDate(d.getUTCDate() - d.getUTCDay()); // 0 = Sun
   d.setUTCHours(0, 0, 0, 0);
-  return d;
+  return new Date(d.getTime() - offsetMin * MIN_MS);
 }
-function startOfMonth(now: Date): Date {
-  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+function startOfMonth(now: Date, offsetMin = 0): Date {
+  const d = shift(now, offsetMin);
+  return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1) - offsetMin * MIN_MS);
 }
-function startOfDay(now: Date = new Date()): Date {
-  const d = new Date(now);
+function startOfDay(now: Date = new Date(), offsetMin = 0): Date {
+  const d = shift(now, offsetMin);
   d.setUTCHours(0, 0, 0, 0);
-  return d;
+  return new Date(d.getTime() - offsetMin * MIN_MS);
 }
 
 async function getCapacity(): Promise<number> {
@@ -75,23 +84,26 @@ export async function checkOut(userId: string) {
 }
 
 // Consecutive-day streak ending today (or yesterday — still "active" today).
-function computeStreak(dayKeys: Set<string>): number {
+function computeStreak(dayKeys: Set<string>, offsetMin = 0): number {
   let streak = 0;
-  const cursor = new Date();
+  // Walk backwards in the user's local time (cursor lives in shifted space, so
+  // its UTC-date slice is the local day key).
+  const cursor = shift(new Date(), offsetMin);
   cursor.setUTCHours(0, 0, 0, 0);
-  if (!dayKeys.has(dayKey(cursor))) {
+  const key = () => cursor.toISOString().slice(0, 10);
+  if (!dayKeys.has(key())) {
     // not in yet today — allow the streak to count up to yesterday
     cursor.setUTCDate(cursor.getUTCDate() - 1);
-    if (!dayKeys.has(dayKey(cursor))) return 0;
+    if (!dayKeys.has(key())) return 0;
   }
-  while (dayKeys.has(dayKey(cursor))) {
+  while (dayKeys.has(key())) {
     streak += 1;
     cursor.setUTCDate(cursor.getUTCDate() - 1);
   }
   return streak;
 }
 
-export async function getSummary(userId: string) {
+export async function getSummary(userId: string, offsetMin = 0) {
   const now = new Date();
   const [open, all, occupancy] = await Promise.all([
     Attendance.findOne({ user: userId, checkOutAt: null }),
@@ -99,16 +111,17 @@ export async function getSummary(userId: string) {
     getOccupancy(),
   ]);
 
-  const dayKeys = new Set(all.map((a) => dayKey(new Date(a.checkInAt as Date))));
-  const streak = computeStreak(dayKeys);
+  const dayKeys = new Set(all.map((a) => dayKey(new Date(a.checkInAt as Date), offsetMin)));
+  const streak = computeStreak(dayKeys, offsetMin);
 
-  const weekStart = startOfWeek(now);
-  const monthStart = startOfMonth(now);
-  const thisWeek = [...dayKeys].filter((k) => new Date(k) >= weekStart).length;
-  const thisMonth = [...dayKeys].filter((k) => new Date(k) >= monthStart).length;
+  // Compare on local day-key strings (ISO dates sort lexicographically).
+  const weekStartKey = dayKey(startOfWeek(now, offsetMin), offsetMin);
+  const monthStartKey = dayKey(startOfMonth(now, offsetMin), offsetMin);
+  const thisWeek = [...dayKeys].filter((k) => k >= weekStartKey).length;
+  const thisMonth = [...dayKeys].filter((k) => k >= monthStartKey).length;
 
-  // Only count an open session as "checked in" if it started today.
-  const checkedInToday = Boolean(open) && (open!.checkInAt as Date) >= startOfDay(now);
+  // Only count an open session as "checked in" if it started today (locally).
+  const checkedInToday = Boolean(open) && (open!.checkInAt as Date) >= startOfDay(now, offsetMin);
 
   return {
     checkedIn: checkedInToday,
@@ -122,10 +135,13 @@ export async function getSummary(userId: string) {
 
 // Last `days` days as a present/absent series, plus a consistency score
 // (% of days attended over the window). Powers the member dashboard.
-export async function getTrend(userId: string, days: number) {
-  const since = new Date();
-  since.setUTCHours(0, 0, 0, 0);
-  since.setUTCDate(since.getUTCDate() - (days - 1));
+export async function getTrend(userId: string, days: number, offsetMin = 0) {
+  // Window start = local midnight, (days - 1) local days ago. cursor lives in
+  // shifted space (its UTC-date slice is the local day key).
+  const cursor = shift(new Date(), offsetMin);
+  cursor.setUTCHours(0, 0, 0, 0);
+  cursor.setUTCDate(cursor.getUTCDate() - (days - 1));
+  const since = new Date(cursor.getTime() - offsetMin * MIN_MS);
 
   const records = await Attendance.find({
     user: userId,
@@ -133,12 +149,11 @@ export async function getTrend(userId: string, days: number) {
   })
     .select('checkInAt')
     .lean();
-  const present = new Set(records.map((r) => dayKey(new Date(r.checkInAt as Date))));
+  const present = new Set(records.map((r) => dayKey(new Date(r.checkInAt as Date), offsetMin)));
 
   const series: { day: string; present: number }[] = [];
-  const cursor = new Date(since);
   for (let i = 0; i < days; i++) {
-    const key = dayKey(cursor);
+    const key = cursor.toISOString().slice(0, 10);
     series.push({ day: key, present: present.has(key) ? 1 : 0 });
     cursor.setUTCDate(cursor.getUTCDate() + 1);
   }
@@ -171,9 +186,10 @@ export async function getBestTime() {
 }
 
 // Attendance days for a given month (calendar view). month is 1-12.
-export async function getMonth(userId: string, year: number, month: number) {
-  const from = new Date(Date.UTC(year, month - 1, 1));
-  const to = new Date(Date.UTC(year, month, 1));
+export async function getMonth(userId: string, year: number, month: number, offsetMin = 0) {
+  // Range spans the LOCAL month: convert local month boundaries to real instants.
+  const from = new Date(Date.UTC(year, month - 1, 1) - offsetMin * MIN_MS);
+  const to = new Date(Date.UTC(year, month, 1) - offsetMin * MIN_MS);
   const records = await Attendance.find({
     user: userId,
     checkInAt: { $gte: from, $lt: to },
@@ -186,6 +202,6 @@ export async function getMonth(userId: string, year: number, month: number) {
     id: String(r._id),
     checkInAt: r.checkInAt,
     checkOutAt: r.checkOutAt ?? null,
-    day: dayKey(new Date(r.checkInAt as Date)),
+    day: dayKey(new Date(r.checkInAt as Date), offsetMin),
   }));
 }

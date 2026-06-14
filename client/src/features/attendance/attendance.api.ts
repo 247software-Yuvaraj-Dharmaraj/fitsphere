@@ -1,5 +1,10 @@
 import { api } from '../../lib/api';
 
+// Browser UTC offset in minutes EAST of UTC (getTimezoneOffset is the inverse),
+// sent to the API so personal day buckets (streak, calendar, week/month) align
+// with the user's local day instead of UTC.
+const tzOffset = () => -new Date().getTimezoneOffset();
+
 export type CrowdLevel = 'LOW' | 'MEDIUM' | 'HIGH' | 'FULL';
 
 export interface Occupancy {
@@ -34,7 +39,7 @@ export interface AttendanceTrend {
 
 export async function getTrend(days = 14, signal?: AbortSignal): Promise<AttendanceTrend> {
   const { data } = await api.get<AttendanceTrend>('/attendance/trend', {
-    params: { days },
+    params: { days, tz: tzOffset() },
     signal,
   });
   return data;
@@ -52,7 +57,10 @@ export async function getBestTime(signal?: AbortSignal): Promise<BestTime> {
 }
 
 export async function getSummary(signal?: AbortSignal): Promise<AttendanceSummary> {
-  const { data } = await api.get<AttendanceSummary>('/attendance/summary', { signal });
+  const { data } = await api.get<AttendanceSummary>('/attendance/summary', {
+    params: { tz: tzOffset() },
+    signal,
+  });
   return data;
 }
 
@@ -62,7 +70,7 @@ export async function getMonth(
   signal?: AbortSignal,
 ): Promise<MonthRecord[]> {
   const { data } = await api.get<MonthRecord[]>('/attendance/month', {
-    params: { year, month },
+    params: { year, month, tz: tzOffset() },
     signal,
   });
   return data;
