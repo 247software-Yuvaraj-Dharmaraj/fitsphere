@@ -8,7 +8,7 @@ export function DensityToggle() {
   const { density, toggleDensity } = useDensity();
   const label = density === 'compact' ? t('common.comfortable') : t('common.compact');
   return (
-    <Tooltip label={label}>
+    <Tooltip label={label} side="bottom">
       <button
         onClick={toggleDensity}
         aria-label={label}
