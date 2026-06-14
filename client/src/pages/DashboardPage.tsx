@@ -59,7 +59,16 @@ export function DashboardPage() {
     }).format(new Date(Date.UTC(2024, 0, 1, h)));
 
   const trendData =
-    trend.data?.series.map((s) => ({ label: s.day.slice(8), present: s.present })) ?? [];
+    trend.data?.series.map((s) => ({ label: s.day.slice(8), date: s.day, present: s.present })) ?? [];
+
+  // Full, localized date for the trend tooltip (the axis only shows day-of-month).
+  const fmtTrendDate = (iso: string) =>
+    new Intl.DateTimeFormat(i18n.resolvedLanguage ?? 'en', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      timeZone: 'UTC',
+    }).format(new Date(`${iso}T00:00:00Z`));
   const pieData = stats.data
     ? WORKOUT_TYPES.map((type) => ({ type, value: stats.data.byType[type] })).filter(
         (d) => d.value > 0,
@@ -122,6 +131,11 @@ export function DashboardPage() {
                 <Tooltip
                   {...tooltip}
                   cursor={{ fill: 'rgba(148,163,184,0.15)' }}
+                  separator=""
+                  labelFormatter={(_, payload) => {
+                    const iso = payload?.[0]?.payload?.date as string | undefined;
+                    return iso ? fmtTrendDate(iso) : '';
+                  }}
                   formatter={(v) => [Number(v) ? t('dashboard.present') : t('dashboard.absent'), '']}
                 />
                 <Bar dataKey="present" radius={[3, 3, 0, 0]} fill="#16a34a" />
