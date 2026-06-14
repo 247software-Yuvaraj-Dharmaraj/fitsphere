@@ -30,7 +30,8 @@ export function AttendancePage() {
   const checkOut = useCheckOut();
 
   const now = new Date();
-  const [view, setView] = useState({ year: now.getUTCFullYear(), month: now.getUTCMonth() + 1 });
+  // Local year/month so the calendar matches the user's local day buckets.
+  const [view, setView] = useState({ year: now.getFullYear(), month: now.getMonth() + 1 });
   const monthQuery = useMonthAttendance(view.year, view.month);
   const attendedDays = useMemo(
     () => new Set((monthQuery.data ?? []).map((r) => r.day)),
@@ -39,8 +40,8 @@ export function AttendancePage() {
 
   function shiftMonth(delta: number) {
     setView((v) => {
-      const d = new Date(Date.UTC(v.year, v.month - 1 + delta, 1));
-      return { year: d.getUTCFullYear(), month: d.getUTCMonth() + 1 };
+      const d = new Date(v.year, v.month - 1 + delta, 1);
+      return { year: d.getFullYear(), month: d.getMonth() + 1 };
     });
   }
 
