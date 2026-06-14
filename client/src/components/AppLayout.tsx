@@ -55,9 +55,11 @@ export function AppLayout() {
       </a>
       {/* Header */}
       <header className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 dark:border-slate-800 dark:bg-slate-900">
-        <div className="flex items-center gap-2 font-semibold text-brand-700 dark:text-brand-500">
-          <Dumbbell size={22} />
-          <span>{t('app.name')}</span>
+        <div className="flex items-center gap-2">
+          <Dumbbell size={22} className="text-brand-600 dark:text-brand-500" />
+          <span className="bg-gradient-to-r from-brand-700 to-brand-400 bg-clip-text font-display text-lg font-bold tracking-tight text-transparent dark:from-brand-400 dark:to-brand-300">
+            {t('app.name')}
+          </span>
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
           <ThemeToggle />
@@ -78,7 +80,7 @@ export function AppLayout() {
         </aside>
 
         {/* Main content */}
-        <main id="main-content" tabIndex={-1} className="flex-1 p-4 pb-20 outline-none md:p-8 md:pb-8">
+        <main id="main-content" tabIndex={-1} className="min-w-0 flex-1 p-4 pb-20 outline-none compact:p-3 md:p-8 md:pb-8 compact:md:p-6">
           <Suspense fallback={<ContentLoader />}>
             <Outlet />
           </Suspense>

@@ -19,7 +19,7 @@ export function SelectionBar({ count, onClear, onSelectAll, children }: Selectio
   const divider = <div className="h-6 w-px bg-brand-200 dark:bg-brand-500/30" />;
 
   return (
-    <div className="mb-3 flex items-center gap-3 rounded-lg border border-brand-200 bg-brand-50 px-3 py-2 text-sm shadow-sm dark:border-brand-500/30 dark:bg-brand-500/10">
+    <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-brand-200 bg-brand-50 px-3 py-2 text-sm shadow-sm dark:border-brand-500/30 dark:bg-brand-500/10">
       <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-brand-600 px-2 text-xs font-semibold text-white dark:bg-brand-500">
         {count}
       </span>

@@ -3,12 +3,25 @@
 /* Enable `dark:` utilities when an ancestor (or html) has data-theme="dark". */
 @custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 
+/* Enable `compact:` utilities when an ancestor has data-density="compact". */
+@custom-variant compact (&:where([data-density='compact'], [data-density='compact'] *));
+
 @theme {
   --color-brand-50: #eef9f3;
   --color-brand-100: #d6f0e1;
+  --color-brand-300: #6ee7a8;
+  --color-brand-400: #22c55e;
   --color-brand-500: #16a34a;
   --color-brand-600: #15803d;
   --color-brand-700: #166534;
+  --color-brand-800: #14532d;
+
+  /* Typographic system: Space Grotesk for display/headings, Inter for body.
+     Tamil (ta locale) falls back to Noto Sans Tamil for full glyph coverage. */
+  --font-sans:
+    'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans Tamil', sans-serif;
+  --font-display:
+    'Space Grotesk Variable', 'Inter Variable', 'Noto Sans Tamil', system-ui, sans-serif;
 }
 
 html {
@@ -27,16 +40,31 @@ body,
 
 body {
   margin: 0;
-  /* 'Noto Sans Tamil' is the per-glyph fallback for Tamil codepoints the OS
-     system font may not cover (avoids tofu boxes in the ta locale). */
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans Tamil', sans-serif;
-  background-color: #f8fafc;
+  /* Inter as the body face; 'Noto Sans Tamil' is the per-glyph fallback for
+     Tamil codepoints (avoids tofu boxes in the ta locale). */
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
   color: #0f172a;
+  /* Subtle layered background: a faint brand glow up top over a cool base,
+     so the canvas reads as designed rather than a flat fill. */
+  background-color: #f6f8f7;
+  background-image: radial-gradient(60rem 32rem at 100% -8%, rgba(34, 197, 94, 0.07), transparent 60%);
+  background-attachment: fixed;
 }
 
 [data-theme='dark'] body {
-  background-color: #020617;
   color: #f1f5f9;
+  background-color: #020617;
+  background-image: radial-gradient(60rem 32rem at 100% -8%, rgba(34, 197, 94, 0.1), transparent 60%);
+}
+
+/* Display face + tightened tracking for prominent headings (page titles,
+   auth title). Tight letter-spacing on large type is a hand-tuned, "designed"
+   signal that flat default styling lacks. */
+h1 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
 }
 
 /* Micro-interactions: subtle enter animations for overlays/drawers/dialogs. */
@@ -211,4 +239,37 @@ button:disabled,
 [role='button'][aria-disabled='true'],
 select:disabled {
   cursor: not-allowed;
+}
+
+/* ---- Card elevation: soft layered shadow + lift on hover, so surfaces read
+   as floating panels with depth instead of flat outlined boxes. Applied via
+   the shared .fs-card class so every Card gets it from one place. */
+.fs-card {
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 1px 3px rgba(15, 23, 42, 0.06);
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+.fs-card:hover {
+  box-shadow:
+    0 6px 16px rgba(15, 23, 42, 0.08),
+    0 2px 6px rgba(15, 23, 42, 0.05);
+}
+[data-theme='dark'] .fs-card {
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.4),
+    0 1px 3px rgba(0, 0, 0, 0.3);
+}
+[data-theme='dark'] .fs-card:hover {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+}
+
+/* ---- Density: compact mode condenses padding/gaps app-wide.
+   Card padding is caller-supplied (p-4/p-5/p-6), so override it here rather
+   than at every call site. Unlayered rules beat Tailwind's layered utilities,
+   and the [data-density='compact'] scope means comfortable mode is untouched. */
+[data-density='compact'] .fs-card {
+  padding: 0.75rem;
 }

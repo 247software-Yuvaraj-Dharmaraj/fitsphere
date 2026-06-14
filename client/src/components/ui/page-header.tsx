@@ -9,7 +9,7 @@ interface PageHeaderProps {
 
 export function PageHeader({ title, subtitle, actions, icon }: PageHeaderProps) {
   return (
-    <div className="mb-6 flex items-start justify-between gap-4">
+    <div className="mb-6 flex items-start justify-between gap-4 compact:mb-4">
       <div className="flex items-start gap-3">
         {icon && (
           <span className="mt-1 shrink-0 text-brand-600 dark:text-brand-400" aria-hidden>
@@ -17,7 +17,7 @@ export function PageHeader({ title, subtitle, actions, icon }: PageHeaderProps) 
           </span>
         )}
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{title}</h1>
+          <h1 className="text-2xl font-bold text-slate-900 compact:text-xl dark:text-slate-100">{title}</h1>
           {subtitle && <p className="text-sm text-slate-500 dark:text-slate-400">{subtitle}</p>}
         </div>
       </div>
