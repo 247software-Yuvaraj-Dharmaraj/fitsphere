@@ -39,13 +39,13 @@ export function ProfilePage() {
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-100 text-brand-600 dark:bg-brand-500/20 dark:text-brand-400">
             <UserCircle size={32} />
           </div>
-          <div>
-            <p className="text-lg font-semibold text-slate-800 dark:text-slate-100">{user?.name}</p>
+          <div className="min-w-0">
+            <p className="truncate text-lg font-semibold text-slate-800 dark:text-slate-100">{user?.name}</p>
             <p className="flex items-center gap-1 text-sm text-slate-500 dark:text-slate-400">
-              <Mail size={14} /> {user?.email}
+              <Mail size={14} className="shrink-0" /> <span className="truncate">{user?.email}</span>
             </p>
           </div>
-          <span className="ml-auto">
+          <span className="ml-auto shrink-0">
             <Badge tone="slate">
               <Shield size={12} className="mr-1" />
               {t(`roles.${user?.role}`)}

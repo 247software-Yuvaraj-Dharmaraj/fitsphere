@@ -78,7 +78,7 @@ export function AppLayout() {
         </aside>
 
         {/* Main content */}
-        <main id="main-content" tabIndex={-1} className="flex-1 p-4 pb-20 outline-none md:p-8 md:pb-8">
+        <main id="main-content" tabIndex={-1} className="min-w-0 flex-1 p-4 pb-20 outline-none md:p-8 md:pb-8">
           <Suspense fallback={<ContentLoader />}>
             <Outlet />
           </Suspense>

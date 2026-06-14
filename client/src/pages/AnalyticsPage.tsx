@@ -209,12 +209,12 @@ export function AnalyticsPage() {
 
       {/* Member directory + debounced search */}
       <section className="mt-4">
-        <div className="mb-3 flex items-center justify-between gap-3">
+        <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-200">
             {t('analytics.members')}
           </h2>
-          <div className="flex items-center gap-2">
-            <div className="relative">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <div className="relative w-full sm:w-56">
               <Search size={15} className="absolute top-2.5 left-2 text-slate-400" />
               <input
                 type="search"
@@ -225,22 +225,24 @@ export function AnalyticsPage() {
                 className={`${fieldClasses} pl-8`}
               />
             </div>
-            <Select
-              value={statusFilter}
-              onChange={(e) => onStatusChange(e.target.value)}
-              aria-label={t('analytics.status')}
-              className="w-auto"
-              options={[
-                { value: 'ALL', label: t('analytics.statusFilter.all') },
-                { value: 'ACTIVE', label: t('analytics.statuses.ACTIVE') },
-                { value: 'AT_RISK', label: t('analytics.statuses.AT_RISK') },
-                { value: 'INACTIVE', label: t('analytics.statuses.INACTIVE') },
-              ]}
-            />
-            <Button variant="secondary" size="sm" onClick={exportXlsx} loading={exporting}>
-              {!exporting && <Download size={14} />}
-              {t('analytics.exportXlsx')}
-            </Button>
+            <div className="flex gap-2">
+              <Select
+                value={statusFilter}
+                onChange={(e) => onStatusChange(e.target.value)}
+                aria-label={t('analytics.status')}
+                className="min-w-0 flex-1 sm:w-auto sm:flex-none"
+                options={[
+                  { value: 'ALL', label: t('analytics.statusFilter.all') },
+                  { value: 'ACTIVE', label: t('analytics.statuses.ACTIVE') },
+                  { value: 'AT_RISK', label: t('analytics.statuses.AT_RISK') },
+                  { value: 'INACTIVE', label: t('analytics.statuses.INACTIVE') },
+                ]}
+              />
+              <Button variant="secondary" size="sm" onClick={exportXlsx} loading={exporting}>
+                {!exporting && <Download size={14} />}
+                {t('analytics.exportXlsx')}
+              </Button>
+            </div>
           </div>
         </div>
         <DataGrid
