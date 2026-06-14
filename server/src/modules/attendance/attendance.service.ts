@@ -75,13 +75,25 @@ export async function checkIn(userId: string) {
     await open.save();
   }
 
-  // Spec rule: new check-ins are disabled at full capacity.
-  const occupancy = await getOccupancy();
-  if (occupancy.level === 'FULL') {
+  // Spec rule: new check-ins are disabled at full capacity. Occupancy is a count
+  // ACROSS documents, so it can't be guard-inserted atomically the way a single
+  // slot's seat is (and two concurrent inserts of new docs don't write-conflict,
+  // so a transaction wouldn't help either). Fast-reject when already full, then
+  // create and re-check: if WE pushed the gym over capacity, roll our record back.
+  // This closes the read-then-create race; any residual near-simultaneous overlap
+  // self-corrects as members check out.
+  const capacity = await getCapacity();
+  const activeFilter = { checkOutAt: null, checkInAt: { $gte: today } };
+  if ((await Attendance.countDocuments(activeFilter)) >= capacity) {
     throw new HttpError(409, 'The gym is at full capacity. Please try again later.');
   }
 
   const record = await Attendance.create({ user: userId, checkInAt: new Date() });
+  if ((await Attendance.countDocuments(activeFilter)) > capacity) {
+    await Attendance.deleteOne({ _id: record._id }); // we tipped it over — undo
+    throw new HttpError(409, 'The gym is at full capacity. Please try again later.');
+  }
+
   emitOccupancy(await getOccupancy()); // push live update to all clients
   return record;
 }
